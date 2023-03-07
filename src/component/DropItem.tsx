@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useDrop } from "react-dnd";
 import styled from "styled-components";
 
+import { useAppContext } from "../App.provider";
 import { ItemDragTypes } from "../App";
 
 const StyledDropBlock = styled.div`
@@ -10,15 +11,19 @@ const StyledDropBlock = styled.div`
 `;
 
 export const DropItem = () => {
+  const { dispatch } = useAppContext();
+
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemDragTypes.CONSTRUCTOR_ITEM,
-    drop: () => console.log("drop"),
+    drop: () => ({ name: "drop container" }),
+    /*  drop: () => dispatch({ type: "dropItem" }), */
     collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
     }),
 
     hover: () => {
-      console.log("hover");
+      // console.log("hover");
     },
   }));
   return <StyledDropBlock ref={drop} />;

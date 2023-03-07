@@ -1,4 +1,8 @@
+import { useReducer } from "react";
 import styled from "styled-components";
+
+import { initialState, reducer } from "./business/reducer";
+import { AppContext } from "./App.provider";
 import { DragItem } from "./component/DragItem";
 import { DropItem } from "./component/DropItem";
 
@@ -34,20 +38,22 @@ export const ItemDragTypes = {
 
 export const APP_DATA = {};
 
-const App = () => {
+export const App = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   return (
-    <StyledContainer>
-      <DragContainer>
-        <DragItem id="1" />
-        <DragItem id="2" />
-        <DragItem id="3" />
-      </DragContainer>
-      <DropContainer>
-        drop here
-        <DropItem></DropItem>
-      </DropContainer>
-    </StyledContainer>
+    <AppContext.Provider value={{ state, dispatch }}>
+      <StyledContainer>
+        <DragContainer>
+          <DragItem id="1" />
+          <DragItem id="2" />
+          <DragItem id="3" />
+        </DragContainer>
+        <DropContainer>
+          drop here
+          <DropItem></DropItem>
+        </DropContainer>
+      </StyledContainer>
+    </AppContext.Provider>
   );
 };
-
-export default App;
