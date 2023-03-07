@@ -41,17 +41,37 @@ export const APP_DATA = {};
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const dragList = state.sideBar.map((constructorItem) => {
+    return (
+      <DragItem
+        id={constructorItem.name}
+        name={constructorItem.name}
+        key={constructorItem.name}
+        view={constructorItem.view}
+      />
+    );
+  });
+
+  const calculatorList = state.canvas.length
+    ? state.canvas.map((constructorItem) => {
+        return (
+          <DragItem
+            id={constructorItem.name}
+            name={constructorItem.name}
+            key={constructorItem.name}
+            view={constructorItem.view}
+          />
+        );
+      })
+    : [];
+
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <StyledContainer>
-        <DragContainer>
-          <DragItem id="1" />
-          <DragItem id="2" />
-          <DragItem id="3" />
-        </DragContainer>
+        <DragContainer>{dragList}</DragContainer>
         <DropContainer>
           drop here
-          <DropItem></DropItem>
+          <DropItem calculatorList={calculatorList}></DropItem>
         </DropContainer>
       </StyledContainer>
     </AppContext.Provider>

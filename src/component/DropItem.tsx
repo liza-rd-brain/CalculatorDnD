@@ -4,13 +4,18 @@ import styled from "styled-components";
 
 import { useAppContext } from "../App.provider";
 import { ItemDragTypes } from "../App";
+import { CalculatorItem } from "../business/types";
 
 const StyledDropBlock = styled.div`
   width: 240px;
   height: 480px;
 `;
 
-export const DropItem = () => {
+type DropItemProps = {
+  calculatorList: JSX.Element[];
+};
+
+export const DropItem: FC<DropItemProps> = ({ calculatorList }) => {
   const { dispatch } = useAppContext();
 
   const [{ isOver }, drop] = useDrop(() => ({
@@ -26,5 +31,5 @@ export const DropItem = () => {
       // console.log("hover");
     },
   }));
-  return <StyledDropBlock ref={drop} />;
+  return <StyledDropBlock ref={drop}>{calculatorList}</StyledDropBlock>;
 };
