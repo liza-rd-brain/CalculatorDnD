@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, useRef } from "react";
 import styled from "styled-components";
-import { useDrag } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 
 import { useAppContext } from "../App.provider";
 import { DragType, ItemDragType } from "../App";
@@ -17,6 +17,7 @@ type DragProps = {
   name: CalculatorItemName;
   view: CalculatorItemView;
   type: DragType;
+  itemIndex?: number;
 };
 
 type DropResult = {
@@ -45,16 +46,25 @@ const getCalculator = (name: CalculatorItemName) => {
   }
 };
 
-export const DragItem: FC<DragProps> = ({ id, name, view, type }) => {
-  console.log("type", type);
+export const DragItem: FC<DragProps> = ({
+  id,
+  name,
+  view,
+  type,
+  itemIndex,
+}) => {
+  // console.log("type", type);
   const { state, dispatch } = useAppContext();
+  const ref = useRef<HTMLDivElement>(null);
+
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
       type: type,
-      item: { id },
+      item: { id, index: itemIndex },
       end: (item, monitor) => {
         //DEPENDS WHAT AND FROM WHERE DRAG
         const dropResult = monitor.getDropResult<DropResult>();
+        console.log("dropResult", dropResult);
         if (item && dropResult) {
           console.log(`You dropped ${item.id} into ${dropResult.name}!`);
           dispatch({ type: "draggedItem", payload: { id: id, type: type } });
@@ -62,18 +72,27 @@ export const DragItem: FC<DragProps> = ({ id, name, view, type }) => {
       },
       collect: (monitor) => ({ isDragging: monitor.isDragging() }),
       canDrag: () => {
+        console.log("canDrag", view === "active");
         return view === "active";
       },
     }),
     [state.sideBar]
   );
 
-  return (
-    // <StyledDragBlock ref={isDragging ? dragPreview : drag}>
-    //   {name}
-    // </StyledDragBlock>
-    <StyledDragBlock ref={isDragging ? dragPreview : drag}>
-      {getCalculator(name)}
-    </StyledDragBlock>
-  );
+  const [{ isOver, handlerId }, drop] = useDrop(() => ({
+    accept: ItemDragType.CALCULATOR_ITEM,
+    drop: () => ({ name: "drop container" }),
+    hover: (item: { id: string; index: number }, monitor) =>
+      console.log("hover index", item.index),
+    /*  drop: () => dispatch({ type: "dropItem" }), */
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+      handlerId: monitor.getHandlerId(),
+    }),
+  }));
+
+  drag(drop(ref));
+
+  return <StyledDragBlock ref={ref}>{getCalculator(name)}</StyledDragBlock>;
 };

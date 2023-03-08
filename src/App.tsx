@@ -6,7 +6,8 @@ import { AppContext } from "./App.provider";
 import { DragItem } from "./component/DragItem";
 import { DropItem } from "./component/DropItem";
 
-import Example from "./example/example";
+import ExampleFirst from "./example/first/example";
+import ExampleSecond from "./example/second/example";
 
 const StyledContainer = styled.div`
   width: 800px;
@@ -35,13 +36,6 @@ const DropContainer = styled.div`
   border: 2px dashed #c4c4c4;
   display: flex;
   justify-content: center;
-  /* display: flex;
-  gap: 16px;
-  flex-direction: column;
-  justify-content: space-around;
-  -webkit-box-align: center;
-  align-items: center;
- ; */
 `;
 
 export const ItemDragType = {
@@ -68,7 +62,7 @@ export const App = () => {
   });
 
   const calculatorList = state.canvas.length
-    ? state.canvas.map((constructorItem) => {
+    ? state.canvas.map((constructorItem, index) => {
         return (
           <DragItem
             id={constructorItem.name}
@@ -76,6 +70,7 @@ export const App = () => {
             key={constructorItem.name}
             view={constructorItem.view}
             type={ItemDragType.CALCULATOR_ITEM}
+            itemIndex={index}
           />
         );
       })
@@ -90,7 +85,7 @@ export const App = () => {
           <DropItem calculatorList={calculatorList}></DropItem>
         </DropContainer>
 
-        <Example />
+        <ExampleFirst />
       </StyledContainer>
     </AppContext.Provider>
   );

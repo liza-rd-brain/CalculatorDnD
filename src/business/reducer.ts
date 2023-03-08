@@ -19,9 +19,14 @@ export const reducer = (
     case "draggedItem": {
       switch (action.payload.type) {
         case "calculatorItem": {
+          // const currElemIndex = state.canvas.findIndex(
+          //   (calculatorItem) => calculatorItem.name === action.payload.id
+          // );
+          console.log("DND");
           return state;
         }
         case "constructorItem": {
+          //TODO: took out like separate function
           const newCalculatorItem: CalculatorItem = state.sideBar.find(
             (calculatorItem) => calculatorItem.name === action.payload.id
           ) as CalculatorItem;

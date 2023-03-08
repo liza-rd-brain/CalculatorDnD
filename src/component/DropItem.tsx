@@ -21,20 +21,24 @@ type DropItemProps = {
 };
 
 export const DropItem: FC<DropItemProps> = ({ calculatorList }) => {
-  const { dispatch } = useAppContext();
-  const ref = useRef(null);
+  const { state, dispatch } = useAppContext();
 
-  const [{ isOver, handlerId }, drop] = useDrop(() => ({
-    accept: ItemDragType.CONSTRUCTOR_ITEM || ItemDragType.CALCULATOR_ITEM,
-    drop: () => ({ name: "drop container" }),
-    /*  drop: () => dispatch({ type: "dropItem" }), */
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-      handlerId: monitor.getHandlerId(),
+  console.log("TESTE");
+
+  const [{ isOver, handlerId }, drop] = useDrop(
+    () => ({
+      accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
+      hover: (item: { id: string; index: number }, monitor) =>
+        console.log("hover index on DROP", item.index),
+      /*  drop: () => dispatch({ type: "dropItem" }), */
+      drop: () => console.log("made drop"),
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: true,
+        handlerId: monitor.getHandlerId(),
+      }),
     }),
-
-    hover: (item, monitor) => {},
-  }));
+    [state.canvas, state.sideBar]
+  );
   return <StyledDropBlock ref={drop}>{calculatorList}</StyledDropBlock>;
 };
