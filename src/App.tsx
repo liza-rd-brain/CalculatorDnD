@@ -6,8 +6,10 @@ import { AppContext } from "./App.provider";
 import { DragItem } from "./component/DragItem";
 import { DropItem } from "./component/DropItem";
 
+import Example from "./example/example";
+
 const StyledContainer = styled.div`
-  width: 625px;
+  width: 800px;
   height: 640px;
   border: 1px solid #000;
   margin: 200px auto;
@@ -17,7 +19,7 @@ const StyledContainer = styled.div`
 `;
 
 const DragContainer = styled.div`
-  width: 240px;
+  width: 50%;
   height: 480px;
   border: 3px solid #70bb3e;
   display: flex;
@@ -73,6 +75,8 @@ export const App = () => {
           drop here
           <DropItem calculatorList={calculatorList}></DropItem>
         </DropContainer>
+
+        <Example />
       </StyledContainer>
     </AppContext.Provider>
   );

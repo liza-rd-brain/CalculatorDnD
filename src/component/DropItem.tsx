@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useRef } from "react";
 import { useDrop } from "react-dnd";
 import styled from "styled-components";
 
@@ -17,19 +17,19 @@ type DropItemProps = {
 
 export const DropItem: FC<DropItemProps> = ({ calculatorList }) => {
   const { dispatch } = useAppContext();
+  const ref = useRef(null);
 
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver, handlerId }, drop] = useDrop(() => ({
     accept: ItemDragTypes.CONSTRUCTOR_ITEM,
     drop: () => ({ name: "drop container" }),
     /*  drop: () => dispatch({ type: "dropItem" }), */
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
+      handlerId: monitor.getHandlerId(),
     }),
 
-    hover: () => {
-      // console.log("hover");
-    },
+    hover: (item, monitor) => {},
   }));
   return <StyledDropBlock ref={drop}>{calculatorList}</StyledDropBlock>;
 };

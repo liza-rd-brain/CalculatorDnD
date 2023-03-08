@@ -16,13 +16,7 @@ export const reducer = (
   action: ActionType
 ): State => {
   switch (action.type) {
-    case "test": {
-      console.log("test");
-      return state;
-    }
-
     case "copyItem": {
-      console.log(action.payload);
       const newCalculatorItem: CalculatorItem = state.sideBar.find(
         (calculatorItem) => calculatorItem.name === action.payload
       ) as CalculatorItem;
