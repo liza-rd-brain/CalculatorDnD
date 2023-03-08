@@ -23,17 +23,25 @@ const DragContainer = styled.div`
   height: 480px;
   /* border: 3px solid #70bb3e; */
   display: flex;
+  gap: 26px;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 `;
 
 const DropContainer = styled.div`
-  width: 243px;
-  height: 448px;
+  width: 50%;
+  height: 480px;
   border: 2px dashed #c4c4c4;
-
-  /* border: 3px solid gold; */
+  display: flex;
+  justify-content: center;
+  /* display: flex;
+  gap: 16px;
+  flex-direction: column;
+  justify-content: space-around;
+  -webkit-box-align: center;
+  align-items: center;
+ ; */
 `;
 
 export const ItemDragType = {

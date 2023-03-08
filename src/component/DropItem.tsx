@@ -9,7 +9,11 @@ import { CalculatorItem } from "../business/types";
 
 const StyledDropBlock = styled.div`
   width: 240px;
-  height: 480px;
+  height: 100%;
+  display: flex;
+  gap: 26px;
+  flex-direction: column;
+  align-items: center;
 `;
 
 type DropItemProps = {
