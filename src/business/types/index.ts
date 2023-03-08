@@ -1,3 +1,5 @@
+import { DragType } from "../../App";
+
 type AppPhase = "constructor" | "calculator";
 
 export type State = {
@@ -24,4 +26,4 @@ type IdItem = string;
 export type ActionType =
   | { type: "dropItem" }
   | { type: "test" }
-  | { type: "copyItem"; payload: IdItem };
+  | { type: "draggedItem"; payload: { id: IdItem; type: DragType } };

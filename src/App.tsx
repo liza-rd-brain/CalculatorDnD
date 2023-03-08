@@ -21,7 +21,7 @@ const StyledContainer = styled.div`
 const DragContainer = styled.div`
   width: 50%;
   height: 480px;
-  border: 3px solid #70bb3e;
+  /* border: 3px solid #70bb3e; */
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -29,16 +29,20 @@ const DragContainer = styled.div`
 `;
 
 const DropContainer = styled.div`
-  width: 240px;
-  height: 480px;
-  border: 3px solid gold;
+  width: 243px;
+  height: 448px;
+  border: 2px dashed #c4c4c4;
+
+  /* border: 3px solid gold; */
 `;
 
-export const ItemDragTypes = {
+export const ItemDragType = {
   CONSTRUCTOR_ITEM: "constructorItem",
-};
+  CALCULATOR_ITEM: "calculatorItem",
+} as const;
 
-export const APP_DATA = {};
+type KeysDrag = keyof typeof ItemDragType;
+export type DragType = (typeof ItemDragType)[KeysDrag];
 
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -50,6 +54,7 @@ export const App = () => {
         name={constructorItem.name}
         key={constructorItem.name}
         view={constructorItem.view}
+        type={ItemDragType.CONSTRUCTOR_ITEM}
       />
     );
   });
@@ -62,6 +67,7 @@ export const App = () => {
             name={constructorItem.name}
             key={constructorItem.name}
             view={constructorItem.view}
+            type={ItemDragType.CALCULATOR_ITEM}
           />
         );
       })
@@ -72,7 +78,7 @@ export const App = () => {
       <StyledContainer>
         <DragContainer>{dragList}</DragContainer>
         <DropContainer>
-          drop here
+          {/*       drop here */}
           <DropItem calculatorList={calculatorList}></DropItem>
         </DropContainer>
 

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useDrag } from "react-dnd";
 
 import { useAppContext } from "../App.provider";
-import { ItemDragTypes } from "../App";
+import { DragType, ItemDragType } from "../App";
 import { CalculatorItemName, CalculatorItemView } from "../business/types";
 import { Display } from "./Display";
 import { OperationList } from "./OperationList";
@@ -16,6 +16,7 @@ type DragProps = {
   id: string;
   name: CalculatorItemName;
   view: CalculatorItemView;
+  type: DragType;
 };
 
 type DropResult = {
@@ -44,17 +45,19 @@ const getCalculator = (name: CalculatorItemName) => {
   }
 };
 
-export const DragItem: FC<DragProps> = ({ id, name, view }) => {
+export const DragItem: FC<DragProps> = ({ id, name, view, type }) => {
+  console.log("type", type);
   const { state, dispatch } = useAppContext();
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
-      type: ItemDragTypes.CONSTRUCTOR_ITEM,
+      type: type,
       item: { id },
       end: (item, monitor) => {
+        //DEPENDS WHAT AND FROM WHERE DRAG
         const dropResult = monitor.getDropResult<DropResult>();
         if (item && dropResult) {
           console.log(`You dropped ${item.id} into ${dropResult.name}!`);
-          dispatch({ type: "copyItem", payload: id });
+          dispatch({ type: "draggedItem", payload: { id: id, type: type } });
         }
       },
       collect: (monitor) => ({ isDragging: monitor.isDragging() }),

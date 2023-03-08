@@ -1,9 +1,10 @@
 import { FC, useRef } from "react";
 import { useDrop } from "react-dnd";
 import styled from "styled-components";
+import { ItemDragType } from "../App";
 
 import { useAppContext } from "../App.provider";
-import { ItemDragTypes } from "../App";
+
 import { CalculatorItem } from "../business/types";
 
 const StyledDropBlock = styled.div`
@@ -20,7 +21,7 @@ export const DropItem: FC<DropItemProps> = ({ calculatorList }) => {
   const ref = useRef(null);
 
   const [{ isOver, handlerId }, drop] = useDrop(() => ({
-    accept: ItemDragTypes.CONSTRUCTOR_ITEM,
+    accept: ItemDragType.CONSTRUCTOR_ITEM || ItemDragType.CALCULATOR_ITEM,
     drop: () => ({ name: "drop container" }),
     /*  drop: () => dispatch({ type: "dropItem" }), */
     collect: (monitor) => ({
