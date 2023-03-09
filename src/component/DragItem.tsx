@@ -13,7 +13,7 @@ import { EqualSign } from "./EqualSign";
 const StyledDragBlock = styled.div``;
 
 type DragProps = {
-  id: string;
+  id: CalculatorItemName;
   name: CalculatorItemName;
   view: CalculatorItemView;
   type: DragType;
@@ -67,14 +67,26 @@ export const DragItem: FC<DragProps> = ({
         const dropResult = monitor.getDropResult<any>();
         console.log("dropResult", dropResult);
 
-        console.log(
-          "HOVERsIndex",
-          dropResult.index.current,
-          "curr index",
-          currIndex
-        );
+        // console.log(
+        //   "HOVERsIndex",
+        //   dropResult.index.current,
+        //   "curr index",
+        //   currIndex
+        // );
+
         if (item && dropResult && type === "constructorItem") {
-          dispatch({ type: "draggedItem", payload: { id: id, type: type } });
+          dispatch({ type: "copyItem", payload: { id: id, type: type } });
+        } else if (item && dropResult && type === "calculatorItem") {
+          if (typeof dropResult.index.current === "number") {
+            dispatch({
+              type: "sortItem",
+              //i now for sure here be index - number!
+              payload: {
+                initIndex: currIndex as number,
+                newIndex: dropResult.index.current,
+              },
+            });
+          }
         }
       },
       collect: (monitor) => ({ isDragging: monitor.isDragging() }),
@@ -83,7 +95,7 @@ export const DragItem: FC<DragProps> = ({
         return view === "active";
       },
     }),
-    [state.sideBar]
+    [state.sideBar, state.canvas]
   );
 
   const [{ isOver, handlerId }, drop] = useDrop(
@@ -91,10 +103,12 @@ export const DragItem: FC<DragProps> = ({
       accept: ItemDragType.CALCULATOR_ITEM,
       drop: () => {
         /* 1: On drop return index! */
-        return { index: newIndex };
+        if (typeof newIndex.current === "number") {
+          return { index: newIndex };
+        }
       },
 
-      hover: (item: { id: string; index: number }, monitor) => {
+      hover: (item: { id: CalculatorItemName; index: number }, monitor) => {
         newIndex.current = currIndex as number;
       },
 
@@ -104,7 +118,7 @@ export const DragItem: FC<DragProps> = ({
         handlerId: monitor.getHandlerId(),
       }),
     }),
-    []
+    [state.sideBar, state.canvas]
   );
 
   drag(drop(ref));

@@ -5,7 +5,7 @@ type AppPhase = "constructor" | "calculator";
 export type State = {
   phase: AppPhase;
   sideBar: Array<CalculatorItem>;
-  canvas: CalculatorItem[] | [];
+  canvas: CalculatorItem[];
 };
 
 export type CalculatorItemName =
@@ -21,9 +21,10 @@ export type CalculatorItem = {
   view: CalculatorItemView;
 };
 
-type IdItem = string;
+type IdItem = CalculatorItemName;
 
 export type ActionType =
   | { type: "dropItem" }
   | { type: "test" }
-  | { type: "draggedItem"; payload: { id: IdItem; type: DragType } };
+  | { type: "copyItem"; payload: { id: IdItem; type: DragType } }
+  | { type: "sortItem"; payload: { initIndex: number; newIndex: number } };

@@ -5,7 +5,7 @@ import { ItemDragType } from "../App";
 
 import { useAppContext } from "../App.provider";
 
-import { CalculatorItem } from "../business/types";
+import { CalculatorItem, CalculatorItemName } from "../business/types";
 
 const StyledDropBlock = styled.div`
   width: 240px;
@@ -26,7 +26,7 @@ export const DropItem: FC<DropItemProps> = ({ calculatorList }) => {
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
       accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
-      hover: (item: { id: string; index: number }, monitor) => {},
+      hover: (item: { id: CalculatorItemName; index: number }, monitor) => {},
       drop: () => console.log("made drop"),
       collect: (monitor) => ({
         isOver: monitor.isOver(),

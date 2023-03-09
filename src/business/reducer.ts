@@ -16,40 +16,54 @@ export const reducer = (
   action: ActionType
 ): State => {
   switch (action.type) {
-    case "draggedItem": {
-      switch (action.payload.type) {
-        case "calculatorItem": {
-          // const currElemIndex = state.canvas.findIndex(
-          //   (calculatorItem) => calculatorItem.name === action.payload.id
-          // );
-          console.log("DND");
-          return state;
-        }
-        case "constructorItem": {
-          //TODO: took out like separate function
-          const newCalculatorItem: CalculatorItem = state.sideBar.find(
-            (calculatorItem) => calculatorItem.name === action.payload.id
-          ) as CalculatorItem;
+    case "copyItem": {
+      //TODO: took out like separate function
+      const newCalculatorItem: CalculatorItem = state.sideBar.find(
+        (calculatorItem) => calculatorItem.name === action.payload.id
+      ) as CalculatorItem;
 
-          const newSideBar: CalculatorItem[] = state.sideBar.map(
-            (sideBarItem) => {
-              if (sideBarItem.name === action.payload.id) {
-                return { ...sideBarItem, view: "disable" };
-              } else {
-                return sideBarItem;
-              }
+      const newSideBar: CalculatorItem[] = state.sideBar.map((sideBarItem) => {
+        if (sideBarItem.name === action.payload.id) {
+          return { ...sideBarItem, view: "disable" };
+        } else {
+          return sideBarItem;
+        }
+      });
+
+      const newCanvas = [...state.canvas, newCalculatorItem];
+      const newState = { ...state, canvas: newCanvas, sideBar: newSideBar };
+      console.log("newState", newState);
+      return newState;
+    }
+
+    case "sortItem": {
+      const { initIndex, newIndex } = action.payload;
+      const isShiftForward = initIndex < newIndex;
+
+      const newCanvas = state.canvas.reduce(
+        (
+          prevCanvasList: any /* CalculatorItem[] */,
+          canvasItem: CalculatorItem,
+          canvasItemIndex: number
+        ) => {
+          if (canvasItemIndex === initIndex) {
+            return prevCanvasList;
+          } else if (canvasItemIndex === newIndex) {
+            if (isShiftForward) {
+              return [...prevCanvasList, canvasItem, state.canvas[initIndex]];
+            } else {
+              return [...prevCanvasList, state.canvas[initIndex], canvasItem];
             }
-          );
+          } else {
+            return [...prevCanvasList, canvasItem];
+          }
+        },
+        []
+      );
 
-          const newCanvas = [...state.canvas, newCalculatorItem];
-          const newState = { ...state, canvas: newCanvas, sideBar: newSideBar };
-          console.log("newState", newState);
-          return newState;
-        }
-        default: {
-          return state;
-        }
-      }
+      console.log("newCanvas", newCanvas);
+      const newState = { ...state, canvas: newCanvas };
+      return newState;
     }
 
     default:
