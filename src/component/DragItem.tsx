@@ -17,7 +17,7 @@ type DragProps = {
   name: CalculatorItemName;
   view: CalculatorItemView;
   type: DragType;
-  itemIndex?: number;
+  currIndex?: number;
 };
 
 type DropResult = {
@@ -51,22 +51,29 @@ export const DragItem: FC<DragProps> = ({
   name,
   view,
   type,
-  itemIndex,
+  currIndex,
 }) => {
-  // console.log("type", type);
   const { state, dispatch } = useAppContext();
   const ref = useRef<HTMLDivElement>(null);
+  //НА КАКОЙ ПОРЯДОК ВСТАНЕТ ЭТОТ ЭЛЕМЕНТ
+  const newIndex = useRef<number | undefined>(undefined);
 
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
       type: type,
-      item: { id, index: itemIndex },
+      item: { id, index: currIndex },
       end: (item, monitor) => {
-        //DEPENDS WHAT AND FROM WHERE DRAG
-        const dropResult = monitor.getDropResult<DropResult>();
+        /* 2: Get this index here! */
+        const dropResult = monitor.getDropResult<any>();
         console.log("dropResult", dropResult);
-        if (item && dropResult) {
-          console.log(`You dropped ${item.id} into ${dropResult.name}!`);
+
+        console.log(
+          "HOVERsIndex",
+          dropResult.index.current,
+          "curr index",
+          currIndex
+        );
+        if (item && dropResult && type === "constructorItem") {
           dispatch({ type: "draggedItem", payload: { id: id, type: type } });
         }
       },
@@ -79,18 +86,26 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar]
   );
 
-  const [{ isOver, handlerId }, drop] = useDrop(() => ({
-    accept: ItemDragType.CALCULATOR_ITEM,
-    drop: () => ({ name: "drop container" }),
-    hover: (item: { id: string; index: number }, monitor) =>
-      console.log("hover index", item.index),
-    /*  drop: () => dispatch({ type: "dropItem" }), */
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-      handlerId: monitor.getHandlerId(),
+  const [{ isOver, handlerId }, drop] = useDrop(
+    () => ({
+      accept: ItemDragType.CALCULATOR_ITEM,
+      drop: () => {
+        /* 1: On drop return index! */
+        return { index: newIndex };
+      },
+
+      hover: (item: { id: string; index: number }, monitor) => {
+        newIndex.current = currIndex as number;
+      },
+
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+        handlerId: monitor.getHandlerId(),
+      }),
     }),
-  }));
+    []
+  );
 
   drag(drop(ref));
 

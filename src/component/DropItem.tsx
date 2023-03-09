@@ -23,14 +23,10 @@ type DropItemProps = {
 export const DropItem: FC<DropItemProps> = ({ calculatorList }) => {
   const { state, dispatch } = useAppContext();
 
-  console.log("TESTE");
-
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
       accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
-      hover: (item: { id: string; index: number }, monitor) =>
-        console.log("hover index on DROP", item.index),
-      /*  drop: () => dispatch({ type: "dropItem" }), */
+      hover: (item: { id: string; index: number }, monitor) => {},
       drop: () => console.log("made drop"),
       collect: (monitor) => ({
         isOver: monitor.isOver(),

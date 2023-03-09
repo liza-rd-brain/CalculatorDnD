@@ -7,7 +7,6 @@ import { DragItem } from "./component/DragItem";
 import { DropItem } from "./component/DropItem";
 
 import ExampleFirst from "./example/first/example";
-import ExampleSecond from "./example/second/example";
 
 const StyledContainer = styled.div`
   width: 800px;
@@ -70,7 +69,7 @@ export const App = () => {
             key={constructorItem.name}
             view={constructorItem.view}
             type={ItemDragType.CALCULATOR_ITEM}
-            itemIndex={index}
+            currIndex={index}
           />
         );
       })
