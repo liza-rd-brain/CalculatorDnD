@@ -11,11 +11,59 @@ import { NumberPanel } from "./NumberPanel";
 import { EqualSign } from "./EqualSign";
 
 const StyledDragBlock = styled.div<{ hasHover: boolean }>`
+  position: relative;
   border-bottom: ${({ hasHover }) => {
     if (hasHover) {
-      return "1px solid black";
+      return "1px solid #5D5FEF";
+    } else {
+      return "none";
     }
   }};
+  padding-bottom: ${({ hasHover }) => {
+    if (hasHover) {
+      return "8px";
+    } else {
+      return "none";
+    }
+  }};
+
+  //TODO: took out common
+  &:before {
+    content: "";
+    display: ${({ hasHover }) => {
+      if (hasHover) {
+        return "block";
+      } else {
+        return "none";
+      }
+    }};
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #5d5fef;
+    transform: rotate(45deg);
+    bottom: -2px;
+    left: -3px;
+    z-index: 1;
+  }
+  &:after {
+    content: "";
+    display: ${({ hasHover }) => {
+      if (hasHover) {
+        return "block";
+      } else {
+        return "none";
+      }
+    }};
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: #5d5fef;
+    transform: rotate(45deg);
+    bottom: -2px;
+    right: -3px;
+    z-index: 1;
+  }
 `;
 
 type DragProps = {
@@ -27,6 +75,8 @@ type DragProps = {
   hoverRef?: React.MutableRefObject<{
     orderNumber: number | undefined;
   }>;
+
+  refDropOverlay?: React.RefObject<HTMLDivElement>;
 };
 
 type DropResult = {
@@ -62,11 +112,21 @@ export const DragItem: FC<DragProps> = ({
   type,
   currIndex,
   hoverRef,
+  refDropOverlay,
 }) => {
   const { state, dispatch } = useAppContext();
   const ref = useRef<HTMLDivElement>(null);
   //НА КАКОЙ ПОРЯДОК ВСТАНЕТ ЭТОТ ЭЛЕМЕНТ
   const newIndex = useRef<number | undefined>(undefined);
+
+  if (Number(currIndex) === Number(hoverRef?.current.orderNumber)) {
+    // console.log("draw hover line");
+  }
+
+  const hasHover = Number(currIndex) === Number(hoverRef?.current.orderNumber);
+  if (hasHover) {
+    console.log(hasHover);
+  }
 
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
@@ -74,6 +134,13 @@ export const DragItem: FC<DragProps> = ({
       item: { id, index: currIndex },
       end: (item, monitor) => {
         /* 2: Get this index here! */
+        // eslint-disable-next-line
+
+        if (hoverRef) {
+          console.log("hoverEnd");
+          hoverRef.current.orderNumber = undefined;
+        }
+
         const dropResult = monitor.getDropResult<any>();
 
         if (item && dropResult && type === "constructorItem") {
@@ -85,6 +152,7 @@ export const DragItem: FC<DragProps> = ({
           typeof dropResult.index.current === "number" &&
           dropResult.index.current !== currIndex
         ) {
+          console.log("sholud be sort");
           dispatch({
             type: "sortItem",
             //now for sure here be index - number!
@@ -103,22 +171,39 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar, state.canvas]
   );
 
-  const [{ isOver, handlerId }, drop] = useDrop(
+  const [{ isOver, canDrop, handlerId }, drop] = useDrop(
     () => ({
-      accept: ItemDragType.CONSTRUCTOR_ITEM,
+      accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
       drop: () => {
+        if (hoverRef) {
+          console.log("endOfDrop");
+          hoverRef.current.orderNumber = undefined;
+        }
+
         if (typeof newIndex.current === "number") {
           return { index: newIndex };
         }
       },
 
       hover: (item: { id: CalculatorItemName; index: number }, monitor) => {
-        /*  console.log("hover on DragItem", id); */
+        if (!canDrop && type === "constructorItem") {
+          if (hoverRef) {
+            console.log("un draw hover line");
+            hoverRef.current.orderNumber = undefined;
+          }
+        }
         newIndex.current = currIndex as number;
       },
 
       canDrop: (item, monitor) => {
-        return type === "calculatorItem";
+        if (type === "calculatorItem") {
+          return true;
+        } else {
+          if (hoverRef) {
+            hoverRef.current.orderNumber = undefined;
+          }
+          return false;
+        }
       },
 
       collect: (monitor) => ({
@@ -130,9 +215,13 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar, state.canvas]
   );
 
-  const hasHover = Number(currIndex) === Number(hoverRef?.current.orderNumber);
+  /*   console.log(hasHover, currIndex); */
 
-  console.log(hasHover, currIndex);
+  // if (newIndex) {
+  //   refDropOverlay && drag(drop(refDropOverlay));
+  // } else {
+  //   drag(drop(ref));
+  // }
 
   drag(drop(ref));
 
@@ -140,7 +229,8 @@ export const DragItem: FC<DragProps> = ({
     <StyledDragBlock
       ref={ref}
       hasHover={
-        Number(currIndex) === Number(hoverRef?.current.orderNumber && isOver)
+        /* canDrop && */ Number(currIndex) ===
+        Number(hoverRef?.current.orderNumber)
       }
     >
       {getCalculator(name, hasHover)}

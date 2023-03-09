@@ -1,5 +1,5 @@
 import { FC, useRef } from "react";
-import { useDrop } from "react-dnd";
+import { useDrop, XYCoord } from "react-dnd";
 import styled from "styled-components";
 import { ItemDragType } from "../App";
 
@@ -19,29 +19,65 @@ const StyledDropBlock = styled.div<{ isHover: boolean }>`
       return "#F0F9FF";
     }
   }};
+  /*   box-sizing: border-box;
+  & > * {
+    margin-bottom: 26px;
+  }
+  & > :last-child {
+    margin-bottom: 0;
+  } */
 `;
 
 type DropItemProps = {
-  calculatorList: JSX.Element[];
-  hoverRef: React.RefObject<HTMLDivElement>;
+  getCalculatorList: (ref: any) => JSX.Element[];
+  hoverRef: React.MutableRefObject<{
+    orderNumber: number | undefined;
+  }>;
 };
 
-export const DropItem: FC<DropItemProps> = ({ calculatorList, hoverRef }) => {
+export const DropItem: FC<DropItemProps> = ({
+  getCalculatorList,
+  hoverRef,
+}) => {
   const { state, dispatch } = useAppContext();
+  const refTest = useRef<HTMLDivElement>(null);
   const isCanvasEmpty = !state.canvas.length;
 
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
       accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
       hover: (item: { id: CalculatorItemName; index: number }, monitor) => {
+        if (!refTest.current) {
+          return;
+        }
+
         if (isCanvasEmpty) {
-          console.log("hover drop");
+        } else {
+          hoverRef.current.orderNumber = state.canvas.length - 1;
+
+          const hoverBoundingRect = refTest.current?.getBoundingClientRect();
+          // Get vertical middle
+          const hoverMiddleY =
+            (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+          // Determine mouse position
+          const clientOffset = monitor.getClientOffset();
+
+          // Get pixels to the top
+          const hoverClientY =
+            (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+          const newHoverIndex = undefined;
         }
       },
-      drop: () => console.log("made drop"),
+      drop: (item, monitor) => {
+        hoverRef.current.orderNumber = undefined;
+        /* console.log("made drop") */
+      },
+
       collect: (monitor) => ({
         isOver: monitor.isOver(),
-        canDrop: true,
+        canDrop: monitor.canDrop(),
         handlerId: monitor.getHandlerId(),
       }),
     }),
@@ -49,9 +85,11 @@ export const DropItem: FC<DropItemProps> = ({ calculatorList, hoverRef }) => {
     [state.canvas, state.sideBar]
   );
 
+  drop(refTest);
+
   return (
-    <StyledDropBlock isHover={isOver && isCanvasEmpty} ref={drop}>
-      {calculatorList}
+    <StyledDropBlock isHover={isOver && isCanvasEmpty} ref={refTest}>
+      {getCalculatorList(refTest)}
     </StyledDropBlock>
   );
 };

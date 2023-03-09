@@ -1,5 +1,6 @@
 import { useReducer, useRef } from "react";
 import styled from "styled-components";
+import { useDrop } from "react-dnd";
 
 import { initialState, reducer } from "./business/reducer";
 import { AppContext } from "./App.provider";
@@ -47,7 +48,9 @@ export type DragType = (typeof ItemDragType)[KeysDrag];
 
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const hoverRef = useRef<HTMLDivElement>(null);
+  const hoverRef = useRef<{ orderNumber: number | undefined }>({
+    orderNumber: undefined,
+  });
 
   const dragList = state.sideBar.map((constructorItem) => {
     return (
@@ -61,29 +64,47 @@ export const App = () => {
     );
   });
 
-  const calculatorList = state.canvas.length
-    ? state.canvas.map((constructorItem, index) => {
-        return (
-          <DragItem
-            id={constructorItem.name}
-            name={constructorItem.name}
-            key={constructorItem.name}
-            view={constructorItem.view}
-            type={ItemDragType.CALCULATOR_ITEM}
-            currIndex={index}
-          />
-        );
-      })
-    : [];
+  const getCalculatorList = (ref: React.RefObject<HTMLDivElement>) => {
+    const calculatorList = state.canvas.length
+      ? state.canvas.map((constructorItem, index) => {
+          return (
+            <DragItem
+              id={constructorItem.name}
+              name={constructorItem.name}
+              key={constructorItem.name}
+              view={constructorItem.view}
+              type={ItemDragType.CALCULATOR_ITEM}
+              currIndex={index}
+              hoverRef={hoverRef}
+              refDropOverlay={ref}
+            />
+          );
+        })
+      : [];
+    return calculatorList;
+  };
+  const [{}, drop] = useDrop(() => ({
+    accept: ItemDragType.CONSTRUCTOR_ITEM,
+    canDrop: () => false,
+
+    collect: (monitor) => ({
+      canDrop: !monitor.canDrop(),
+    }),
+    hover: () => {
+      if (hoverRef) {
+        hoverRef.current.orderNumber = undefined;
+      }
+    },
+  }));
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <StyledContainer>
-        <DragContainer>{dragList}</DragContainer>
+        <DragContainer ref={drop}>{dragList}</DragContainer>
         <DropContainer>
           {/*       drop here */}
           <DropItem
-            calculatorList={calculatorList}
+            getCalculatorList={getCalculatorList}
             hoverRef={hoverRef}
           ></DropItem>
         </DropContainer>
