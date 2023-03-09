@@ -21,9 +21,9 @@ const StyledContainer = styled.div`
 
 const DragContainer = styled.div`
   width: 50%;
-  height: 480px;
+  height: 448px;
   display: flex;
-  gap: 26px;
+  gap: 12px;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
@@ -31,7 +31,7 @@ const DragContainer = styled.div`
 
 const DropContainer = styled.div`
   width: 50%;
-  height: 480px;
+  height: 448px;
   border: 2px dashed #c4c4c4;
   display: flex;
   justify-content: center;

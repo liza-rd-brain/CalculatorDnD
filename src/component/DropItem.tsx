@@ -11,7 +11,7 @@ const StyledDropBlock = styled.div<{ isHover: boolean }>`
   width: 240px;
   height: 100%;
   display: flex;
-  gap: 26px;
+  /* gap: 12px; */
   flex-direction: column;
   align-items: center;
   background-color: ${({ isHover }) => {
@@ -19,13 +19,14 @@ const StyledDropBlock = styled.div<{ isHover: boolean }>`
       return "#F0F9FF";
     }
   }};
-  /*   box-sizing: border-box;
+  /* box-sizing: border-box; */
   & > * {
-    margin-bottom: 26px;
+    margin: 0 12px auto;
+    /* margin-bottom: 12px; */
   }
   & > :last-child {
     margin-bottom: 0;
-  } */
+  }
 `;
 
 type DropItemProps = {
