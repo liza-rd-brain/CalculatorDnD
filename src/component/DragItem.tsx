@@ -75,7 +75,7 @@ type DragProps = {
   hoverRef?: React.MutableRefObject<{
     orderNumber: number | undefined;
   }>;
-
+  hasBorder?: boolean;
   refDropOverlay?: React.RefObject<HTMLDivElement>;
 };
 
@@ -83,20 +83,25 @@ type DropResult = {
   name: CalculatorItemName;
 };
 
-const getCalculator = (name: CalculatorItemName, hasHover: boolean) => {
+const getCalculator = (
+  name: CalculatorItemName,
+  hasHover: boolean,
+  view: CalculatorItemView,
+  hasBorder: boolean = false
+) => {
   switch (name) {
     case "display": {
-      return <Display />;
+      return <Display view={view} hasBorder={hasBorder} />;
     }
     case "operationList": {
-      return <OperationList />;
+      return <OperationList view={view} hasBorder={hasBorder} />;
     }
 
     case "numberPanel": {
-      return <NumberPanel />;
+      return <NumberPanel view={view} hasBorder={hasBorder} />;
     }
     case "equalSign": {
-      return <EqualSign />;
+      return <EqualSign view={view} hasBorder={hasBorder} />;
     }
 
     default: {
@@ -113,6 +118,7 @@ export const DragItem: FC<DragProps> = ({
   currIndex,
   hoverRef,
   refDropOverlay,
+  hasBorder,
 }) => {
   const { state, dispatch } = useAppContext();
   const ref = useRef<HTMLDivElement>(null);
@@ -215,14 +221,6 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar, state.canvas]
   );
 
-  /*   console.log(hasHover, currIndex); */
-
-  // if (newIndex) {
-  //   refDropOverlay && drag(drop(refDropOverlay));
-  // } else {
-  //   drag(drop(ref));
-  // }
-
   drag(drop(ref));
 
   return (
@@ -233,7 +231,7 @@ export const DragItem: FC<DragProps> = ({
         Number(hoverRef?.current.orderNumber)
       }
     >
-      {getCalculator(name, hasHover)}
+      {getCalculator(name, hasHover, view, hasBorder)}
     </StyledDragBlock>
   );
 };

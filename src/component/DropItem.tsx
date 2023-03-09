@@ -53,6 +53,7 @@ export const DropItem: FC<DropItemProps> = ({
 
         if (isCanvasEmpty) {
         } else {
+          // if(){}
           hoverRef.current.orderNumber = state.canvas.length - 1;
 
           const hoverBoundingRect = refTest.current?.getBoundingClientRect();

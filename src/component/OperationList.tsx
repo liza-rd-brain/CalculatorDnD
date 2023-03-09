@@ -1,15 +1,29 @@
+import { FC } from "react";
 import styled from "styled-components";
 
+import { CommonCalculatorItem } from "./common/commonStyle";
+import { CalculatorItemView } from "../business/types";
+
 //TODO: took out as common style
-const OperationListContainer = styled.div`
+const OperationListContainer = styled.div<{
+  view: CalculatorItemView;
+  hasBorder: boolean;
+}>`
+  ${CommonCalculatorItem}
   width: 240px;
   height: 60px;
   display: flex;
-  padding: 4px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.06), 0px 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  box-sizing: border-box;
   gap: 10px;
+  box-shadow: ${({ hasBorder, view }) => {
+    if (!hasBorder || view === "disable") {
+      return "none ";
+    }
+  }};
+  opacity: ${({ view }) => {
+    if (view === "disable") {
+      return "0.4 ";
+    }
+  }};
 `;
 
 const OperationItem = styled.div`
@@ -31,9 +45,12 @@ const OperationItem = styled.div`
   border-radius: 6px;
 `;
 
-export const OperationList: any = () => {
+export const OperationList: FC<{
+  view: CalculatorItemView;
+  hasBorder: boolean;
+}> = ({ view, hasBorder }) => {
   return (
-    <OperationListContainer>
+    <OperationListContainer view={view} hasBorder={hasBorder}>
       <OperationItem>/</OperationItem>
       <OperationItem>х</OperationItem>
       <OperationItem>-</OperationItem>

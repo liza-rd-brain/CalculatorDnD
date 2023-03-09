@@ -22,7 +22,6 @@ const StyledContainer = styled.div`
 const DragContainer = styled.div`
   width: 50%;
   height: 480px;
-  /* border: 3px solid #70bb3e; */
   display: flex;
   gap: 26px;
   flex-direction: column;
@@ -60,6 +59,7 @@ export const App = () => {
         key={constructorItem.name}
         view={constructorItem.view}
         type={ItemDragType.CONSTRUCTOR_ITEM}
+        hasBorder={true}
       />
     );
   });
