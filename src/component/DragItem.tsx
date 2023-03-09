@@ -65,7 +65,6 @@ export const DragItem: FC<DragProps> = ({
       end: (item, monitor) => {
         /* 2: Get this index here! */
         const dropResult = monitor.getDropResult<any>();
-        console.log("dropResult", dropResult);
 
         if (item && dropResult && type === "constructorItem") {
           dispatch({ type: "copyItem", payload: { id: id, type: type } });
@@ -78,7 +77,7 @@ export const DragItem: FC<DragProps> = ({
         ) {
           dispatch({
             type: "sortItem",
-            //i now for sure here be index - number!
+            //now for sure here be index - number!
             payload: {
               initIndex: currIndex as number,
               newIndex: dropResult.index.current,
@@ -88,7 +87,6 @@ export const DragItem: FC<DragProps> = ({
       },
       collect: (monitor) => ({ isDragging: monitor.isDragging() }),
       canDrag: () => {
-        console.log("canDrag", view === "active");
         return view === "active";
       },
     }),

@@ -32,7 +32,7 @@ export const reducer = (
 
       const newCanvas = [...state.canvas, newCalculatorItem];
       const newState = { ...state, canvas: newCanvas, sideBar: newSideBar };
-      console.log("newState", newState);
+
       return newState;
     }
 
@@ -61,7 +61,6 @@ export const reducer = (
         []
       );
 
-      console.log("newCanvas", newCanvas);
       const newState = { ...state, canvas: newCanvas };
       return newState;
     }

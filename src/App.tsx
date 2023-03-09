@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useRef } from "react";
 import styled from "styled-components";
 
 import { initialState, reducer } from "./business/reducer";
@@ -47,6 +47,7 @@ export type DragType = (typeof ItemDragType)[KeysDrag];
 
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const hoverRef = useRef<HTMLDivElement>(null);
 
   const dragList = state.sideBar.map((constructorItem) => {
     return (
@@ -81,7 +82,10 @@ export const App = () => {
         <DragContainer>{dragList}</DragContainer>
         <DropContainer>
           {/*       drop here */}
-          <DropItem calculatorList={calculatorList}></DropItem>
+          <DropItem
+            calculatorList={calculatorList}
+            hoverRef={hoverRef}
+          ></DropItem>
         </DropContainer>
 
         <ExampleFirst />
