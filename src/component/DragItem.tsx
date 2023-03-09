@@ -10,7 +10,13 @@ import { OperationList } from "./OperationList";
 import { NumberPanel } from "./NumberPanel";
 import { EqualSign } from "./EqualSign";
 
-const StyledDragBlock = styled.div``;
+const StyledDragBlock = styled.div<{ hasHover: boolean }>`
+  border-bottom: ${({ hasHover }) => {
+    if (hasHover) {
+      return "1px solid black";
+    }
+  }};
+`;
 
 type DragProps = {
   id: CalculatorItemName;
@@ -18,13 +24,16 @@ type DragProps = {
   view: CalculatorItemView;
   type: DragType;
   currIndex?: number;
+  hoverRef?: React.MutableRefObject<{
+    orderNumber: number | undefined;
+  }>;
 };
 
 type DropResult = {
   name: CalculatorItemName;
 };
 
-const getCalculator = (name: CalculatorItemName) => {
+const getCalculator = (name: CalculatorItemName, hasHover: boolean) => {
   switch (name) {
     case "display": {
       return <Display />;
@@ -52,6 +61,7 @@ export const DragItem: FC<DragProps> = ({
   view,
   type,
   currIndex,
+  hoverRef,
 }) => {
   const { state, dispatch } = useAppContext();
   const ref = useRef<HTMLDivElement>(null);
@@ -95,7 +105,7 @@ export const DragItem: FC<DragProps> = ({
 
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
-      accept: ItemDragType.CALCULATOR_ITEM,
+      accept: ItemDragType.CONSTRUCTOR_ITEM,
       drop: () => {
         if (typeof newIndex.current === "number") {
           return { index: newIndex };
@@ -103,7 +113,12 @@ export const DragItem: FC<DragProps> = ({
       },
 
       hover: (item: { id: CalculatorItemName; index: number }, monitor) => {
+        /*  console.log("hover on DragItem", id); */
         newIndex.current = currIndex as number;
+      },
+
+      canDrop: (item, monitor) => {
+        return type === "calculatorItem";
       },
 
       collect: (monitor) => ({
@@ -115,7 +130,20 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar, state.canvas]
   );
 
+  const hasHover = Number(currIndex) === Number(hoverRef?.current.orderNumber);
+
+  console.log(hasHover, currIndex);
+
   drag(drop(ref));
 
-  return <StyledDragBlock ref={ref}>{getCalculator(name)}</StyledDragBlock>;
+  return (
+    <StyledDragBlock
+      ref={ref}
+      hasHover={
+        Number(currIndex) === Number(hoverRef?.current.orderNumber && isOver)
+      }
+    >
+      {getCalculator(name, hasHover)}
+    </StyledDragBlock>
+  );
 };
