@@ -27,4 +27,7 @@ export type ActionType =
   | { type: "dropItem" }
   | { type: "test" }
   | { type: "copyItem"; payload: { id: IdItem; type: DragType } }
-  | { type: "sortItem"; payload: { initIndex: number; newIndex: number } };
+  | {
+      type: "sortItem";
+      payload: { initIndex: number /* | undefined */; newIndex: number };
+    };

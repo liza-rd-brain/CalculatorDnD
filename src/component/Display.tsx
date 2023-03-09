@@ -11,6 +11,8 @@ const DisplayContainer = styled.div<{
 }>`
   ${CommonCalculatorItem}
   display: flex;
+  justify-content: center;
+  align-items: center;
   width: 240px;
   height: 60px;
   box-shadow: ${({ hasBorder, view }) => {
@@ -18,6 +20,13 @@ const DisplayContainer = styled.div<{
       return "none ";
     }
   }};
+
+  padding: ${({ hasBorder }) => {
+    if (hasBorder) {
+      return "4px";
+    }
+  }};
+
   opacity: ${({ view }) => {
     if (view === "disable") {
       return "0.4 ";
@@ -61,7 +70,6 @@ export const Display: FC<{ view: CalculatorItemView; hasBorder: boolean }> = ({
   view,
   hasBorder,
 }) => {
-  console.log(view);
   return (
     <DisplayContainer view={view} hasBorder={hasBorder}>
       <DisplayBlock>0</DisplayBlock>

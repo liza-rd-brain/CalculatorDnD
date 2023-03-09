@@ -1,15 +1,20 @@
 import { FC, useRef } from "react";
 import { useDrop, XYCoord } from "react-dnd";
 import styled from "styled-components";
-import { ItemDragType } from "../App";
+import { ItemDragType, DragType } from "../App";
 
 import { useAppContext } from "../App.provider";
 
 import { CalculatorItem, CalculatorItemName } from "../business/types";
 
-const StyledDropBlock = styled.div<{ isHover: boolean }>`
+const StyledDropBlock = styled.div<{
+  isHover: boolean;
+  needBorder: boolean;
+}>`
   width: 240px;
   height: 100%;
+
+  /* margin: 20px 0px; */
   display: flex;
   /* gap: 12px; */
   flex-direction: column;
@@ -19,26 +24,33 @@ const StyledDropBlock = styled.div<{ isHover: boolean }>`
       return "#F0F9FF";
     }
   }};
+  border: ${({ needBorder }) => {
+    if (needBorder) {
+      return "2px dashed #c4c4c4";
+    }
+  }};
+  border-radius: 6px;
+  /* gap: 12px; */
   /* box-sizing: border-box; */
   & > * {
-    margin: 0 12px auto;
-    /* margin-bottom: 12px; */
+    padding: 4px 0px 4px;
+    width: 100%;
   }
-  & > :last-child {
-    margin-bottom: 0;
-  }
+  /* & > :nth-child(4) {
+    padding-bottom: 0;
+  } */
 `;
 
 type DropItemProps = {
   getCalculatorList: (ref: any) => JSX.Element[];
-  hoverRef: React.MutableRefObject<{
+  hoverPositionRef: React.MutableRefObject<{
     orderNumber: number | undefined;
   }>;
 };
 
 export const DropItem: FC<DropItemProps> = ({
   getCalculatorList,
-  hoverRef,
+  hoverPositionRef,
 }) => {
   const { state, dispatch } = useAppContext();
   const refTest = useRef<HTMLDivElement>(null);
@@ -47,34 +59,31 @@ export const DropItem: FC<DropItemProps> = ({
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
       accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
-      hover: (item: { id: CalculatorItemName; index: number }, monitor) => {
+      hover: (
+        item: {
+          id: CalculatorItemName;
+          index: number;
+          containerType: DragType;
+        },
+        monitor
+      ) => {
         if (!refTest.current) {
           return;
         }
 
         if (isCanvasEmpty) {
         } else {
-          // if(){}
-          hoverRef.current.orderNumber = state.canvas.length - 1;
-
-          const hoverBoundingRect = refTest.current?.getBoundingClientRect();
-          // Get vertical middle
-          const hoverMiddleY =
-            (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-          // Determine mouse position
-          const clientOffset = monitor.getClientOffset();
-
-          // Get pixels to the top
-          const hoverClientY =
-            (clientOffset as XYCoord).y - hoverBoundingRect.top;
-
-          const newHoverIndex = undefined;
+          if (item.containerType === "constructorItem") {
+            // console.log(item);
+            //если тянем  из конструктора в калькулятор дефолтно подсветим нижни элемент
+            //изначально hover вся равно будет на dropItem
+            /* !!!!!!!! */
+            hoverPositionRef.current.orderNumber = state.canvas.length;
+          }
         }
       },
       drop: (item, monitor) => {
-        hoverRef.current.orderNumber = undefined;
-        /* console.log("made drop") */
+        hoverPositionRef.current.orderNumber = undefined;
       },
 
       collect: (monitor) => ({
@@ -90,7 +99,11 @@ export const DropItem: FC<DropItemProps> = ({
   drop(refTest);
 
   return (
-    <StyledDropBlock isHover={isOver && isCanvasEmpty} ref={refTest}>
+    <StyledDropBlock
+      isHover={isOver && isCanvasEmpty}
+      ref={refTest}
+      needBorder={isCanvasEmpty}
+    >
       {getCalculatorList(refTest)}
     </StyledDropBlock>
   );

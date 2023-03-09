@@ -11,13 +11,17 @@ const NumberPanelContainer = styled.div<{
 }>`
   ${CommonCalculatorItem}
   width: 240px;
-
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   box-shadow: ${({ hasBorder, view }) => {
     if (!hasBorder || view === "disable") {
       return "none ";
+    }
+  }};
+  padding: ${({ hasBorder }) => {
+    if (hasBorder) {
+      return "4px";
     }
   }};
   opacity: ${({ view }) => {

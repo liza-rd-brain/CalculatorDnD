@@ -32,9 +32,11 @@ const DragContainer = styled.div`
 const DropContainer = styled.div`
   width: 50%;
   height: 448px;
-  border: 2px dashed #c4c4c4;
+  /* border: 2px dashed #c4c4c4; */
   display: flex;
   justify-content: center;
+  margin: 20px 0;
+  box-sizing: border-box;
 `;
 
 export const ItemDragType = {
@@ -47,7 +49,7 @@ export type DragType = (typeof ItemDragType)[KeysDrag];
 
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const hoverRef = useRef<{ orderNumber: number | undefined }>({
+  const hoverPositionRef = useRef<{ orderNumber: number | undefined }>({
     orderNumber: undefined,
   });
 
@@ -75,7 +77,7 @@ export const App = () => {
               view={constructorItem.view}
               type={ItemDragType.CALCULATOR_ITEM}
               currIndex={index}
-              hoverRef={hoverRef}
+              hoverPositionRef={hoverPositionRef}
               refDropOverlay={ref}
             />
           );
@@ -91,8 +93,8 @@ export const App = () => {
       canDrop: !monitor.canDrop(),
     }),
     hover: () => {
-      if (hoverRef) {
-        hoverRef.current.orderNumber = undefined;
+      if (hoverPositionRef) {
+        hoverPositionRef.current.orderNumber = undefined;
       }
     },
   }));
@@ -105,7 +107,7 @@ export const App = () => {
           {/*       drop here */}
           <DropItem
             getCalculatorList={getCalculatorList}
-            hoverRef={hoverRef}
+            hoverPositionRef={hoverPositionRef}
           ></DropItem>
         </DropContainer>
 

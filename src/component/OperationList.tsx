@@ -13,10 +13,17 @@ const OperationListContainer = styled.div<{
   width: 240px;
   height: 60px;
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 10px;
   box-shadow: ${({ hasBorder, view }) => {
     if (!hasBorder || view === "disable") {
       return "none ";
+    }
+  }};
+  padding: ${({ hasBorder }) => {
+    if (hasBorder) {
+      return "4px";
     }
   }};
   opacity: ${({ view }) => {
