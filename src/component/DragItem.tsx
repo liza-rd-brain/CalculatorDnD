@@ -60,6 +60,7 @@ const StyledDragBlock = styled.div<{
     left: -3px;
     z-index: 1;
   }
+
   &:after {
     content: "";
     display: ${({ hasHoverTop, hasHoverBottom }) => {
@@ -327,13 +328,15 @@ export const DragItem: FC<DragProps> = ({
   return (
     <StyledDragBlock
       ref={ref}
+      //only for first element
       hasHoverTop={
-        /* canDrop && */ Number(currIndex) ===
-        Number(hoverPositionRef?.current.orderNumber)
+        canDrop &&
+        Number(currIndex) === Number(hoverPositionRef?.current.orderNumber) &&
+        Number(currIndex) === 0
       }
       hasHoverBottom={
-        /* canDrop && */ Number(currIndex) + 1 ===
-        Number(hoverPositionRef?.current.orderNumber)
+        canDrop &&
+        Number(currIndex) + 1 === Number(hoverPositionRef?.current.orderNumber)
       }
     >
       {getCalculator(name, hasHover, view, hasBorder)}

@@ -73,7 +73,10 @@ export const DropItem: FC<DropItemProps> = ({
 
         if (isCanvasEmpty) {
         } else {
-          if (item.containerType === "constructorItem") {
+          if (
+            item.containerType === "constructorItem" &&
+            !hoverPositionRef.current.orderNumber
+          ) {
             // console.log(item);
             //если тянем  из конструктора в калькулятор дефолтно подсветим нижни элемент
             //изначально hover вся равно будет на dropItem
