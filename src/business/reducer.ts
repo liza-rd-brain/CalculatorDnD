@@ -42,7 +42,7 @@ export const reducer = (
 
       const newCanvas = state.canvas.reduce(
         (
-          prevCanvasList: any /* CalculatorItem[] */,
+          prevCanvasList: CalculatorItem[],
           canvasItem: CalculatorItem,
           canvasItemIndex: number
         ) => {

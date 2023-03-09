@@ -67,26 +67,23 @@ export const DragItem: FC<DragProps> = ({
         const dropResult = monitor.getDropResult<any>();
         console.log("dropResult", dropResult);
 
-        // console.log(
-        //   "HOVERsIndex",
-        //   dropResult.index.current,
-        //   "curr index",
-        //   currIndex
-        // );
-
         if (item && dropResult && type === "constructorItem") {
           dispatch({ type: "copyItem", payload: { id: id, type: type } });
-        } else if (item && dropResult && type === "calculatorItem") {
-          if (typeof dropResult.index.current === "number") {
-            dispatch({
-              type: "sortItem",
-              //i now for sure here be index - number!
-              payload: {
-                initIndex: currIndex as number,
-                newIndex: dropResult.index.current,
-              },
-            });
-          }
+        } else if (
+          item &&
+          type === "calculatorItem" &&
+          dropResult.index &&
+          typeof dropResult.index.current === "number" &&
+          dropResult.index.current !== currIndex
+        ) {
+          dispatch({
+            type: "sortItem",
+            //i now for sure here be index - number!
+            payload: {
+              initIndex: currIndex as number,
+              newIndex: dropResult.index.current,
+            },
+          });
         }
       },
       collect: (monitor) => ({ isDragging: monitor.isDragging() }),
@@ -102,7 +99,6 @@ export const DragItem: FC<DragProps> = ({
     () => ({
       accept: ItemDragType.CALCULATOR_ITEM,
       drop: () => {
-        /* 1: On drop return index! */
         if (typeof newIndex.current === "number") {
           return { index: newIndex };
         }
