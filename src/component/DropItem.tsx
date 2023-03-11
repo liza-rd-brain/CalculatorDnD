@@ -7,6 +7,19 @@ import { useAppContext } from "../App.provider";
 
 import { CalculatorItem, CalculatorItemName } from "../business/types";
 
+import separator from "./underline.png";
+
+const TestBlock = styled.div<{ hasUnderline: boolean }>`
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: ${({ hasUnderline }) => {
+    if (hasUnderline) {
+      return `url(${separator})`;
+    }
+  }};
+  background-position: bottom;
+`;
+
 const StyledDropBlock = styled.div<{
   isHover: boolean;
   needBorder: boolean;
@@ -52,7 +65,8 @@ type DropItemProps = {
   getCalculatorList: (ref: any) => JSX.Element[];
   hoverItemInfo: React.MutableRefObject<{
     underlineLevel: string | undefined;
-    testProperty?: any;
+    underlineDropElem?: any;
+    elemWithUnderline: HTMLDivElement | undefined;
   }>;
 };
 
@@ -61,9 +75,9 @@ export const DropItem: FC<DropItemProps> = ({
   hoverItemInfo,
 }) => {
   const { state, dispatch } = useAppContext();
-  const refTest = useRef<HTMLDivElement>(null);
+  const dropNodeRef = useRef<HTMLDivElement>(null);
   const isCanvasEmpty = !state.canvas.length;
-  // underlineLevel.current.testProperty = false;
+  // underlineLevel.current.underlineDropElem = false;
 
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
@@ -76,27 +90,28 @@ export const DropItem: FC<DropItemProps> = ({
         },
         monitor
       ) => {
-        // console.log(hoverItemInfo);
-        if (!refTest.current) {
+        monitor.isOver({ shallow: true });
+
+        if (!dropNodeRef.current) {
           return;
         }
-
-        if (isOver) {
-          // hoverItemInfo.current.underlineLevel = undefined;
-          hoverItemInfo.current.testProperty = false;
+        console.log("started underline");
+        // hoverItemInfo.current.underlineDropElem = true;
+        const dropBlock = document.getElementById("styledDropBlock");
+        if (dropBlock) {
+          const lastDragItem = dropBlock.querySelector(
+            ".styledDrag .styledDropBlock:last-child"
+          );
+          // const lastDragItem = Array.from(
+          //   dropBlock.querySelectorAll(".styledDrag")
+          // ).at(-1);
+          console.log("lastDragItem", lastDragItem);
         }
 
-        if (item.containerType === "constructorItem") {
-          // console.log("hover drop");
-          // hoverItemInfo.current.underlineLevel = `${state.canvas.length}`;
-          hoverItemInfo.current.testProperty = true;
-        } else {
-        }
+        // dragList?.length
       },
       drop: (item, monitor) => {
-        // console.log("item", item);
-        // hoverItemInfo.current.underlineLevel = undefined;
-        hoverItemInfo.current.testProperty = false;
+        hoverItemInfo.current.underlineDropElem = false;
       },
 
       collect: (monitor) => ({
@@ -109,19 +124,25 @@ export const DropItem: FC<DropItemProps> = ({
     [state.canvas, state.sideBar]
   );
 
+  drop(dropNodeRef);
   if (!isOver) {
-    hoverItemInfo.current.testProperty = false;
+    hoverItemInfo.current.underlineDropElem = false;
+    console.log("!isOver");
   }
-
-  drop(refTest);
 
   return (
     <StyledDropBlock
       isHover={isOver && isCanvasEmpty}
-      ref={refTest}
+      ref={dropNodeRef}
       needBorder={isCanvasEmpty}
+      id="styledDropBlock"
     >
-      {getCalculatorList(refTest)}
+      {getCalculatorList(dropNodeRef)}
+      {/* <TestBlock
+        hasUnderline={
+          isOver && !isCanvasEmpty && hoverItemInfo.current.underlineDropElem
+        }
+      /> */}
     </StyledDropBlock>
   );
 };

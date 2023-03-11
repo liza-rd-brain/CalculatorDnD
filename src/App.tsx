@@ -4,7 +4,7 @@ import { useDrop } from "react-dnd";
 
 import { initialState, reducer } from "./business/reducer";
 import { AppContext } from "./App.provider";
-// import { DragItem } from "./component/DragItem";
+
 import { DragItemNew } from "./component/DragItemNew";
 import { DropItem } from "./component/DropItem";
 
@@ -56,11 +56,11 @@ export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const hoverItemInfo = useRef<{
     underlineLevel: string | undefined;
-    testProperty?: any;
+    underlineDropElem?: any;
     elemWithUnderline: HTMLDivElement | undefined;
   }>({
     underlineLevel: undefined,
-    testProperty: undefined,
+    underlineDropElem: undefined,
     elemWithUnderline: undefined,
   });
 
@@ -73,6 +73,7 @@ export const App = () => {
         view={constructorItem.view}
         type={ItemDragType.CONSTRUCTOR_ITEM}
         hasBorder={true}
+        hoverItemInfo={hoverItemInfo}
       />
     );
   });
@@ -105,13 +106,13 @@ export const App = () => {
     hover: () => {
       if (hoverItemInfo) {
         // hoverItemInfo.current.underlineLevel = undefined;
-        // hoverItemInfo.current.testProperty = false;
+        // hoverItemInfo.current.underlineDropElem = false;
       }
     },
     drop: () => {
       if (hoverItemInfo) {
         hoverItemInfo.current.underlineLevel = undefined;
-        hoverItemInfo.current.testProperty = false;
+        hoverItemInfo.current.underlineDropElem = false;
       }
     },
   }));
