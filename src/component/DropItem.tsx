@@ -51,7 +51,7 @@ const StyledDropBlock = styled.div<{
 type DropItemProps = {
   getCalculatorList: (ref: any) => JSX.Element[];
   hoverItemInfo: React.MutableRefObject<{
-    underlineLevel: number | undefined;
+    underlineLevel: string | undefined;
     testProperty?: any;
   }>;
 };
@@ -82,20 +82,20 @@ export const DropItem: FC<DropItemProps> = ({
         }
 
         if (isOver) {
-          hoverItemInfo.current.underlineLevel = undefined;
+          // hoverItemInfo.current.underlineLevel = undefined;
           hoverItemInfo.current.testProperty = false;
         }
 
         if (item.containerType === "constructorItem") {
           // console.log("hover drop");
-          hoverItemInfo.current.underlineLevel = state.canvas.length;
+          // hoverItemInfo.current.underlineLevel = `${state.canvas.length}`;
           hoverItemInfo.current.testProperty = true;
         } else {
         }
       },
       drop: (item, monitor) => {
         // console.log("item", item);
-        hoverItemInfo.current.underlineLevel = undefined;
+        // hoverItemInfo.current.underlineLevel = undefined;
         hoverItemInfo.current.testProperty = false;
       },
 

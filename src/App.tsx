@@ -55,7 +55,7 @@ export type DragType = (typeof ItemDragType)[KeysDrag];
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const hoverItemInfo = useRef<{
-    underlineLevel: number | undefined;
+    underlineLevel: string | undefined;
     testProperty?: any;
     elemWithUnderline: HTMLDivElement | undefined;
   }>({
@@ -104,8 +104,8 @@ export const App = () => {
     }),
     hover: () => {
       if (hoverItemInfo) {
-        hoverItemInfo.current.underlineLevel = undefined;
-        hoverItemInfo.current.testProperty = false;
+        // hoverItemInfo.current.underlineLevel = undefined;
+        // hoverItemInfo.current.testProperty = false;
       }
     },
     drop: () => {

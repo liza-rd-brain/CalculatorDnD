@@ -37,7 +37,7 @@ type DragProps = {
   type: DragType;
   currIndex?: number;
   hoverItemInfo?: React.MutableRefObject<{
-    underlineLevel: number | undefined;
+    underlineLevel: string | undefined;
     testProperty?: any;
     elemWithUnderline: HTMLDivElement | undefined;
   }>;
@@ -148,8 +148,8 @@ export const DragItemNew: FC<DragProps> = ({
         }
 
         if (hoverItemInfo) {
-          hoverItemInfo.current.underlineLevel = undefined;
-          hoverItemInfo.current.testProperty = false;
+          // hoverItemInfo.current.underlineLevel = undefined;
+          // hoverItemInfo.current.testProperty = false;
         }
 
         if (typeof draggingNewIndex.current === "number") {
@@ -166,7 +166,22 @@ export const DragItemNew: FC<DragProps> = ({
         },
         monitor
       ) => {
-        console.log(hoverItemInfo);
+        // console.log(hoverItemInfo);
+        //*Избежать ненужных вычислений
+        // if (draggingNewIndex.current === item.index) {
+        //   return;
+        // }
+        // if (
+        //   hoverItemInfo?.current.elemWithUnderline === dragNodeRef.current &&
+        //   draggingNewIndex.current !== item.index
+        // ) {
+        //   // console.log("не новый элемент");
+        //   // console.log(hoverItemInfo?.current.elemWithUnderline);
+        //   // console.log(dragNodeRef.current);
+        //   return;
+        // } else {
+        //   console.log("перерисовка");
+        // }
 
         if (
           !dragNodeRef.current ||
@@ -191,23 +206,37 @@ export const DragItemNew: FC<DragProps> = ({
         const hoverIndex = draggingNewIndex.current;
 
         const isAboveMiddle = coordDragY - dropMiddleYCoord < 0;
+        const underlayType = isAboveMiddle ? "top" : "bottom";
 
         //!where pull from constructor there is no overlap
         const targetIsNotDropEl =
-          item.containerType === "constructorItem" || currIndex !== item.index;
+          item.containerType === "constructorItem" || dragIndex !== hoverIndex;
 
-        console.log(targetIsNotDropEl);
-
-        ///* Сохраняю элемент, который тяну!!!!/
-        hoverItemInfo.current.elemWithUnderline = dragNodeRef.current;
+        if (
+          (hoverItemInfo?.current.elemWithUnderline === dragNodeRef.current &&
+            draggingNewIndex.current !== item.index &&
+            underlayType === hoverItemInfo?.current.underlineLevel) ||
+          !targetIsNotDropEl
+        ) {
+          return;
+        } else {
+          console.log("перерисовка");
+        }
 
         const pullDown = dragIndex < hoverIndex;
 
-        const hasHoverBottom = targetIsNotDropEl && pullDown && !isAboveMiddle;
+        const hasHoverBottom = targetIsNotDropEl && !isAboveMiddle;
 
-        const hasHoverTop = targetIsNotDropEl && !pullDown && isAboveMiddle;
+        const hasHoverTop = targetIsNotDropEl && isAboveMiddle;
+
+        // //* очищаем предыдущее подчеркивание
+        if (hoverItemInfo.current.elemWithUnderline) {
+          hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
+            "none";
+        }
 
         if (hasHoverTop) {
+          // console.log(dragNodeRef.current);
           dragNodeRef.current.style.backgroundImage = `url(${separator})`;
           dragNodeRef.current.style.backgroundPosition = "top";
         } else if (hasHoverBottom) {
@@ -216,15 +245,18 @@ export const DragItemNew: FC<DragProps> = ({
         } else {
           dragNodeRef.current.style.backgroundImage = "none";
         }
+
+        ///* Сохраняю элемент, который тяну!!!!/
+        hoverItemInfo.current.elemWithUnderline = dragNodeRef.current;
+        hoverItemInfo.current.underlineLevel = isAboveMiddle ? "top" : "bottom";
       },
 
       canDrop: (item, monitor) => {
-        // return true;
         if (type === "calculatorItem") {
           return true;
         } else {
           if (hoverItemInfo) {
-            hoverItemInfo.current.underlineLevel = undefined;
+            // hoverItemInfo.current.underlineLevel = undefined;
           }
           return false;
         }
