@@ -95,8 +95,8 @@ export const DropItem: FC<DropItemProps> = ({
         if (!dropNodeRef.current) {
           return;
         }
-        console.log("started underline");
-        // hoverItemInfo.current.underlineDropElem = true;
+        /*    console.log("started underline"); */
+        hoverItemInfo.current.underlineDropElem = true;
         const dropBlock = document.getElementById("styledDropBlock");
         if (dropBlock) {
           const lastDragItem = dropBlock.querySelector(
@@ -105,7 +105,7 @@ export const DropItem: FC<DropItemProps> = ({
           // const lastDragItem = Array.from(
           //   dropBlock.querySelectorAll(".styledDrag")
           // ).at(-1);
-          console.log("lastDragItem", lastDragItem);
+          /*           console.log("lastDragItem", lastDragItem); */
         }
 
         // dragList?.length

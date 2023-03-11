@@ -170,7 +170,7 @@ export const DragItemNew: FC<DragProps> = ({
         },
         monitor
       ) => {
-        if (hoverItemInfo) hoverItemInfo.current.underlineDropElem = false;
+        // if (hoverItemInfo) hoverItemInfo.current.underlineDropElem = false;
         // console.log(hoverItemInfo);
         //*Избежать ненужных вычислений
         // if (draggingNewIndex.current === item.index) {
@@ -281,17 +281,22 @@ export const DragItemNew: FC<DragProps> = ({
     Number(currIndex) !== 0 &&
     Number(currIndex) + 1 === state.canvas.length;
 
-  console.log("hasHoverBottom", hasHoverBottom);
+  // console.log("hasHoverBottom", hasHoverBottom);
+
+  console.log(
+    "hasHoverBottom",
+    hoverItemInfo?.current.underlineDropElem,
+    currIndex
+  );
 
   return (
     <StyledDragBlock
       className="styledDrag"
       ref={dragNodeRef}
-      // hasHoverBottom={
-      //   hoverItemInfo?.current.underlineDropElem &&
-      //   Number(currIndex) !== 0 &&
-      //   Number(currIndex) + 1 === state.canvas.length
-      // }
+      hasHoverBottom={
+        hoverItemInfo?.current.underlineDropElem &&
+        Number(currIndex) + 1 === state.canvas.length
+      }
     >
       {getCalculator(name, view, hasBorder)}
     </StyledDragBlock>
