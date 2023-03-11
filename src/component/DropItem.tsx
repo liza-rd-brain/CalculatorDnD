@@ -12,7 +12,14 @@ const StyledDropBlock = styled.div<{
   needBorder: boolean;
 }>`
   width: 240px;
-  height: 100%;
+  /* height: 100%; */
+  height: ${({ needBorder }) => {
+    if (!needBorder) {
+      return "456px";
+    } else {
+      return "100%";
+    }
+  }};
 
   /* margin: 20px 0px; */
   display: flex;
@@ -33,7 +40,7 @@ const StyledDropBlock = styled.div<{
   /* gap: 12px; */
   /* box-sizing: border-box; */
   & > * {
-    padding: 4px 0px 4px;
+    padding: 6px 0px 6px;
     width: 100%;
   }
   /* & > :nth-child(4) {
@@ -43,18 +50,20 @@ const StyledDropBlock = styled.div<{
 
 type DropItemProps = {
   getCalculatorList: (ref: any) => JSX.Element[];
-  hoverPositionRef: React.MutableRefObject<{
-    orderNumber: number | undefined;
+  hoverItemInfo: React.MutableRefObject<{
+    underlineLevel: number | undefined;
+    testProperty?: any;
   }>;
 };
 
 export const DropItem: FC<DropItemProps> = ({
   getCalculatorList,
-  hoverPositionRef,
+  hoverItemInfo,
 }) => {
   const { state, dispatch } = useAppContext();
   const refTest = useRef<HTMLDivElement>(null);
   const isCanvasEmpty = !state.canvas.length;
+  // underlineLevel.current.testProperty = false;
 
   const [{ isOver, handlerId }, drop] = useDrop(
     () => ({
@@ -67,26 +76,27 @@ export const DropItem: FC<DropItemProps> = ({
         },
         monitor
       ) => {
+        // console.log(hoverItemInfo);
         if (!refTest.current) {
           return;
         }
 
-        if (isCanvasEmpty) {
+        if (isOver) {
+          hoverItemInfo.current.underlineLevel = undefined;
+          hoverItemInfo.current.testProperty = false;
+        }
+
+        if (item.containerType === "constructorItem") {
+          // console.log("hover drop");
+          hoverItemInfo.current.underlineLevel = state.canvas.length;
+          hoverItemInfo.current.testProperty = true;
         } else {
-          if (
-            item.containerType === "constructorItem" &&
-            !hoverPositionRef.current.orderNumber
-          ) {
-            // console.log(item);
-            //если тянем  из конструктора в калькулятор дефолтно подсветим нижни элемент
-            //изначально hover вся равно будет на dropItem
-            /* !!!!!!!! */
-            hoverPositionRef.current.orderNumber = state.canvas.length;
-          }
         }
       },
       drop: (item, monitor) => {
-        hoverPositionRef.current.orderNumber = undefined;
+        // console.log("item", item);
+        hoverItemInfo.current.underlineLevel = undefined;
+        hoverItemInfo.current.testProperty = false;
       },
 
       collect: (monitor) => ({
@@ -98,6 +108,10 @@ export const DropItem: FC<DropItemProps> = ({
 
     [state.canvas, state.sideBar]
   );
+
+  if (!isOver) {
+    hoverItemInfo.current.testProperty = false;
+  }
 
   drop(refTest);
 

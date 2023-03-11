@@ -19,11 +19,11 @@ export const reducer = (
     case "copyItem": {
       //TODO: took out like separate function
       const newCalculatorItem: CalculatorItem = state.sideBar.find(
-        (calculatorItem) => calculatorItem.name === action.payload.id
+        (calculatorItem) => calculatorItem.name === action.payload.name
       ) as CalculatorItem;
 
       const newSideBar: CalculatorItem[] = state.sideBar.map((sideBarItem) => {
-        if (sideBarItem.name === action.payload.id) {
+        if (sideBarItem.name === action.payload.name) {
           return { ...sideBarItem, view: "disable" };
         } else {
           return sideBarItem;
@@ -37,7 +37,7 @@ export const reducer = (
     }
 
     case "sortItem": {
-      const { initIndex, newIndex } = action.payload;
+      const { initIndex, draggingNewIndex: newIndex } = action.payload;
       const isShiftForward = initIndex < newIndex;
 
       const newCanvas = state.canvas.reduce(

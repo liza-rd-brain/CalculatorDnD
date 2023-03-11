@@ -4,7 +4,8 @@ import { useDrop } from "react-dnd";
 
 import { initialState, reducer } from "./business/reducer";
 import { AppContext } from "./App.provider";
-import { DragItem } from "./component/DragItem";
+// import { DragItem } from "./component/DragItem";
+import { DragItemNew } from "./component/DragItemNew";
 import { DropItem } from "./component/DropItem";
 
 import ExampleFirst from "./example/first/example";
@@ -37,6 +38,10 @@ const DropContainer = styled.div`
   justify-content: center;
   margin: 20px 0;
   box-sizing: border-box;
+  /* & > * > :last-child {
+    box-sizing: border-box;
+    margin-bottom: auto;
+  } */
 `;
 
 export const ItemDragType = {
@@ -49,14 +54,20 @@ export type DragType = (typeof ItemDragType)[KeysDrag];
 
 export const App = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const hoverPositionRef = useRef<{ orderNumber: number | undefined }>({
-    orderNumber: undefined,
+  const hoverItemInfo = useRef<{
+    underlineLevel: number | undefined;
+    testProperty?: any;
+    elemWithUnderline: HTMLDivElement | undefined;
+  }>({
+    underlineLevel: undefined,
+    testProperty: undefined,
+    elemWithUnderline: undefined,
   });
 
   const dragList = state.sideBar.map((constructorItem) => {
     return (
-      <DragItem
-        id={constructorItem.name}
+      <DragItemNew
+        id={`${constructorItem.name}${ItemDragType.CONSTRUCTOR_ITEM}`}
         name={constructorItem.name}
         key={constructorItem.name}
         view={constructorItem.view}
@@ -70,15 +81,14 @@ export const App = () => {
     const calculatorList = state.canvas.length
       ? state.canvas.map((constructorItem, index) => {
           return (
-            <DragItem
-              id={constructorItem.name}
+            <DragItemNew
+              id={`${constructorItem.name}${ItemDragType.CALCULATOR_ITEM}`}
               name={constructorItem.name}
               key={constructorItem.name}
               view={constructorItem.view}
               type={ItemDragType.CALCULATOR_ITEM}
               currIndex={index}
-              hoverPositionRef={hoverPositionRef}
-              refDropOverlay={ref}
+              hoverItemInfo={hoverItemInfo}
             />
           );
         })
@@ -93,8 +103,15 @@ export const App = () => {
       canDrop: !monitor.canDrop(),
     }),
     hover: () => {
-      if (hoverPositionRef) {
-        hoverPositionRef.current.orderNumber = undefined;
+      if (hoverItemInfo) {
+        hoverItemInfo.current.underlineLevel = undefined;
+        hoverItemInfo.current.testProperty = false;
+      }
+    },
+    drop: () => {
+      if (hoverItemInfo) {
+        hoverItemInfo.current.underlineLevel = undefined;
+        hoverItemInfo.current.testProperty = false;
       }
     },
   }));
@@ -107,11 +124,11 @@ export const App = () => {
           {/*       drop here */}
           <DropItem
             getCalculatorList={getCalculatorList}
-            hoverPositionRef={hoverPositionRef}
+            hoverItemInfo={hoverItemInfo}
           ></DropItem>
         </DropContainer>
 
-        <ExampleFirst />
+        {/* <ExampleFirst /> */}
       </StyledContainer>
     </AppContext.Provider>
   );

@@ -21,13 +21,16 @@ export type CalculatorItem = {
   view: CalculatorItemView;
 };
 
-type IdItem = CalculatorItemName;
+type ItemName = CalculatorItemName;
 
 export type ActionType =
   | { type: "dropItem" }
   | { type: "test" }
-  | { type: "copyItem"; payload: { id: IdItem; type: DragType } }
+  | { type: "copyItem"; payload: { name: ItemName; type: DragType } }
   | {
       type: "sortItem";
-      payload: { initIndex: number /* | undefined */; newIndex: number };
+      payload: {
+        initIndex: number /* | undefined */;
+        draggingNewIndex: number;
+      };
     };

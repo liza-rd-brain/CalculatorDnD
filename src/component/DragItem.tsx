@@ -1,6 +1,6 @@
 import { FC, useRef } from "react";
 import styled from "styled-components";
-import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { useDrag, useDrop } from "react-dnd";
 
 import { useAppContext } from "../App.provider";
 import { DragType, ItemDragType } from "../App";
@@ -10,97 +10,37 @@ import { OperationList } from "./OperationList";
 import { NumberPanel } from "./NumberPanel";
 import { EqualSign } from "./EqualSign";
 
+import separator from "./underline.png";
+
 const StyledDragBlock = styled.div<{
-  hasHoverTop: boolean;
-  hasHoverBottom: boolean;
+  hasHoverTop?: boolean;
+  hasHoverBottom?: boolean;
 }>`
   position: relative;
-
-  border-top: ${({ hasHoverTop }) => {
-    if (hasHoverTop) {
-      return "1px solid #5D5FEF";
-    } else {
-      return "1px solid white";
-    }
-  }};
-
-  border-bottom: ${({ hasHoverBottom }) => {
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: ${({ hasHoverBottom }) => {
     if (hasHoverBottom) {
-      return "1px solid #5D5FEF";
-    } else {
-      return "1px solid white";
+      return `url(${separator})`;
     }
   }};
-
-  //TODO: took out common
-  &:before {
-    content: "";
-    display: ${({ hasHoverTop, hasHoverBottom }) => {
-      if (hasHoverTop || hasHoverBottom) {
-        return "block";
-      } else {
-        return "none";
-      }
-    }};
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background-color: #5d5fef;
-    transform: rotate(45deg);
-    top: ${({ hasHoverTop }) => {
-      if (hasHoverTop) {
-        return "-2px";
-      }
-    }};
-    bottom: ${({ hasHoverBottom }) => {
-      if (hasHoverBottom) {
-        return "-2px";
-      }
-    }};
-    left: -3px;
-    z-index: 1;
-  }
-
-  &:after {
-    content: "";
-    display: ${({ hasHoverTop, hasHoverBottom }) => {
-      if (hasHoverTop || hasHoverBottom) {
-        return "block";
-      } else {
-        return "none";
-      }
-    }};
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background-color: #5d5fef;
-    transform: rotate(45deg);
-    top: ${({ hasHoverTop }) => {
-      if (hasHoverTop) {
-        return "-2px";
-      }
-    }};
-    bottom: ${({ hasHoverBottom }) => {
-      if (hasHoverBottom) {
-        return "-2px";
-      }
-    }};
-    right: -3px;
-    z-index: 1;
-  }
+  background-position: bottom;
 `;
 
 type DragProps = {
-  id: CalculatorItemName;
+  id: string;
   name: CalculatorItemName;
   view: CalculatorItemView;
   type: DragType;
   currIndex?: number;
-  hoverPositionRef?: React.MutableRefObject<{
-    orderNumber: number | undefined;
+  hoverItemInfo?: React.MutableRefObject<{
+    underlineLevel: number | undefined;
+    testProperty?: any;
   }>;
   hasBorder?: boolean;
-  refDropOverlay?: React.RefObject<HTMLDivElement>;
 };
 
 type DropResult = {
@@ -140,43 +80,55 @@ export const DragItem: FC<DragProps> = ({
   view,
   type,
   currIndex,
-  hoverPositionRef,
-  refDropOverlay,
+  hoverItemInfo,
+
   hasBorder,
 }) => {
   const { state, dispatch } = useAppContext();
-  const ref = useRef<HTMLDivElement>(null);
+  const dragNodeRef = useRef<HTMLDivElement>(null);
+
+  if (hoverItemInfo) {
+    hoverItemInfo.current.underlineLevel = undefined;
+    // underlineLevel.current.testProperty = false;
+  }
+
+  if (
+    dragNodeRef.current &&
+    !hoverItemInfo?.current.testProperty &&
+    Number(currIndex) + 1 !== state.canvas.length
+  ) {
+    dragNodeRef.current.style.backgroundImage = "none";
+  }
 
   //НА КАКОЙ ПОРЯДОК ВСТАНЕТ ЭТОТ ЭЛЕМЕНТ
   const newIndex = useRef<number | undefined>(undefined);
 
-  if (Number(currIndex) === Number(hoverPositionRef?.current.orderNumber)) {
-    // console.log("draw hover line");
+  if (Number(currIndex) === Number(hoverItemInfo?.current.underlineLevel)) {
   }
 
   const hasHover =
-    Number(currIndex) === Number(hoverPositionRef?.current.orderNumber);
+    Number(currIndex) === Number(hoverItemInfo?.current.underlineLevel);
   if (hasHover) {
-    /*     console.log(hasHover); */
   }
 
   const [{ isDragging }, drag, dragPreview] = useDrag(
     () => ({
       type: type,
-      item: { id, index: currIndex, containerType: type },
+      item: { id, name, index: currIndex, containerType: type },
       end: (item, monitor) => {
-        /* 2: Get this index here! */
-        // eslint-disable-next-line
-
-        if (hoverPositionRef) {
-          console.log("hoverEnd");
-          hoverPositionRef.current.orderNumber = undefined;
+        console.log("remove all underline");
+        if (dragNodeRef.current) {
+          dragNodeRef.current.style.backgroundImage = "none";
+        }
+        if (hoverItemInfo) {
+          hoverItemInfo.current.underlineLevel = undefined;
+          hoverItemInfo.current.testProperty = false;
         }
 
         const dropResult = monitor.getDropResult<any>();
 
         if (item && dropResult && type === "constructorItem") {
-          dispatch({ type: "copyItem", payload: { id: id, type: type } });
+          dispatch({ type: "copyItem", payload: { name, type: type } });
         } else if (
           item &&
           type === "calculatorItem" &&
@@ -185,18 +137,22 @@ export const DragItem: FC<DragProps> = ({
           typeof dropResult.index.current === "number" &&
           dropResult.index.current !== currIndex
         ) {
-          console.log("sholud be sort");
           dispatch({
             type: "sortItem",
             //now for sure here be index - number!
             payload: {
               initIndex: currIndex as number,
-              newIndex: dropResult.index.current,
+              draggingNewIndex: dropResult.index.current,
             },
           });
         }
       },
+      isDragging: (monitor) => {
+        return true;
+      },
+
       collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+
       canDrag: () => {
         return view === "active";
       },
@@ -208,9 +164,13 @@ export const DragItem: FC<DragProps> = ({
     () => ({
       accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
       drop: () => {
-        if (hoverPositionRef) {
-          console.log("endOfDrop");
-          hoverPositionRef.current.orderNumber = undefined;
+        if (dragNodeRef.current) {
+          dragNodeRef.current.style.backgroundImage = "none";
+        }
+
+        if (hoverItemInfo) {
+          hoverItemInfo.current.underlineLevel = undefined;
+          hoverItemInfo.current.testProperty = false;
         }
 
         if (typeof newIndex.current === "number") {
@@ -218,97 +178,122 @@ export const DragItem: FC<DragProps> = ({
         }
       },
 
-      hover: (item: { id: CalculatorItemName; index: number }, monitor) => {
-        // console.log("hover on drag item");
+      hover: (
+        item: {
+          name: CalculatorItemName;
+          index: number;
+          containerType: DragType;
+          id: string;
+        },
+        monitor
+      ) => {
+        console.log("id", id);
+
+        //? очистка предыдущего
+        if (hoverItemInfo) {
+          hoverItemInfo.current.testProperty = false;
+        }
+
+        //? очистка предыдущего
+        if (
+          !isOver &&
+          hoverItemInfo &&
+          dragNodeRef.current &&
+          !hoverItemInfo.current.testProperty
+        ) {
+          dragNodeRef.current.style.backgroundImage = "none";
+        }
+
         if (!canDrop && type === "constructorItem") {
-          if (hoverPositionRef) {
-            console.log("un draw hover line");
-            hoverPositionRef.current.orderNumber = undefined;
+          if (hoverItemInfo) {
+            hoverItemInfo.current.underlineLevel = undefined;
+            hoverItemInfo.current.testProperty = false;
           }
         } else if (type === "calculatorItem") {
-          // console.log("drag calculator");
           if (
-            !ref.current ||
+            !dragNodeRef.current ||
             typeof currIndex !== "number" ||
-            !hoverPositionRef
+            !hoverItemInfo
           ) {
             return;
           }
 
           newIndex.current = currIndex;
+          const hoverBoundingRectDrop =
+            dragNodeRef.current?.getBoundingClientRect();
 
-          const hoverBoundingRect = ref.current?.getBoundingClientRect();
-          // Get vertical middle
-          const hoverMiddleY =
-            (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+          //!!! middle of hover element
+          const dropMiddleYCoord =
+            hoverBoundingRectDrop.y + hoverBoundingRectDrop.height / 2;
 
           // Determine mouse position
-          const clientOffset = monitor.getClientOffset();
+          //!!!! it is position of drag
 
-          // Get pixels to the top
-          const hoverClientY =
-            (clientOffset as XYCoord).y - hoverBoundingRect.top;
+          // console.log("coordDragX", coordDragX);
+
+          const coordDragY = monitor.getClientOffset()?.y as number;
+          const coordDragX = monitor.getClientOffset()?.x as number;
 
           const dragIndex = item.index;
           const hoverIndex = currIndex;
-          //УСЛОВИЕ:
-          hoverPositionRef.current.orderNumber = hoverIndex;
 
-          console.log(hoverPositionRef.current.orderNumber);
+          //*УСЛОВИЕ:
 
-          // console.log(dragIndex, hoverIndex, hoverClientY, hoverMiddleY);
+          const inAreaHorizontal =
+            coordDragX - 5 > hoverBoundingRectDrop.left &&
+            coordDragX + 5 < hoverBoundingRectDrop.right;
 
-          /*    if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY - 50) {
-            // console.log("false 1");
-            return;
+          // console.log("inAreaHorizontal", inAreaHorizontal);
+
+          const isAboveMiddle = coordDragY - dropMiddleYCoord < 0;
+
+          const outOfAreaTop = coordDragY - 5 < hoverBoundingRectDrop.y;
+
+          const outOfAreaBottom = coordDragY - 5 < hoverBoundingRectDrop.y;
+
+          const hoverDeltaNumber = isAboveMiddle
+            ? newIndex.current
+            : newIndex.current + 1;
+
+          //!!!where pull from constructor there is no overlap
+          const targetIsNotDropEl =
+            item.containerType === "constructorItem" ||
+            (hoverDeltaNumber !== dragIndex &&
+              hoverDeltaNumber !== dragIndex + 1);
+
+          hoverItemInfo.current.underlineLevel = targetIsNotDropEl
+            ? hoverDeltaNumber
+            : undefined;
+
+          const hasHoverTop =
+            hoverItemInfo?.current.underlineLevel === 0 &&
+            inAreaHorizontal &&
+            !outOfAreaTop;
+
+          const hasHoverBottom =
+            Number(currIndex) + 1 ===
+              Number(hoverItemInfo?.current.underlineLevel) && inAreaHorizontal;
+
+          if (hasHoverTop) {
+            dragNodeRef.current.style.backgroundImage = `url(${separator})`;
+            dragNodeRef.current.style.backgroundPosition = "top";
+          } else if (hasHoverBottom) {
+            dragNodeRef.current.style.backgroundImage = `url(${separator})`;
+            dragNodeRef.current.style.backgroundPosition = "bottom";
+          } else {
+            dragNodeRef.current.style.backgroundImage = "none";
           }
-
-          // Dragging upwards
-          if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-            // console.log("false 2");
-            return;
-          } else { */
           newIndex.current = hoverIndex;
-
-          const result = [
-            ["hoverIndex", hoverIndex],
-            ["dragIndex", dragIndex],
-            ["hoverClientY", hoverClientY],
-            ["hoverMiddleY", hoverMiddleY],
-          ];
-
-          // console.table(result);
-
-          // console.log(
-          //   "change index",
-          //   hoverIndex,
-          //   dragIndex,
-          //   hoverClientY,
-          //   hoverMiddleY
-          // );
-          // dispatch({
-          //   type: "sortItem",
-          //   //now for sure here be index - number!
-          //   payload: {
-          //     initIndex: hoverIndex,
-          //     newIndex: dragIndex,
-          //   },
-          // });
-          /*    } */
-
-          /* hoverPositionRef.current.orderNumber; */
-
-          // console.log(clientOffset, hoverClientY);
         }
-        // newIndex.current = currIndex as number;
       },
 
       canDrop: (item, monitor) => {
+        // return true;
         if (type === "calculatorItem") {
           return true;
         } else {
-          if (hoverPositionRef) {
-            hoverPositionRef.current.orderNumber = undefined;
+          if (hoverItemInfo) {
+            hoverItemInfo.current.underlineLevel = undefined;
           }
           return false;
         }
@@ -323,20 +308,22 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar, state.canvas]
   );
 
-  drag(drop(ref));
+  if (
+    !isDragging &&
+    hoverItemInfo &&
+    dragNodeRef.current &&
+    !hoverItemInfo.current.testProperty
+  ) {
+  }
+
+  drag(drop(dragNodeRef));
 
   return (
     <StyledDragBlock
-      ref={ref}
-      //only for first element
-      hasHoverTop={
-        canDrop &&
-        Number(currIndex) === Number(hoverPositionRef?.current.orderNumber) &&
-        Number(currIndex) === 0
-      }
+      ref={dragNodeRef}
       hasHoverBottom={
-        canDrop &&
-        Number(currIndex) + 1 === Number(hoverPositionRef?.current.orderNumber)
+        hoverItemInfo?.current.testProperty &&
+        Number(currIndex) + 1 === state.canvas.length
       }
     >
       {getCalculator(name, hasHover, view, hasBorder)}
