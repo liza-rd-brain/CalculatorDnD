@@ -9,23 +9,12 @@ import { CalculatorItem, CalculatorItemName } from "../business/types";
 
 import separator from "./underline.png";
 
-const TestBlock = styled.div<{ hasUnderline: boolean }>`
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-image: ${({ hasUnderline }) => {
-    if (hasUnderline) {
-      return `url(${separator})`;
-    }
-  }};
-  background-position: bottom;
-`;
-
 const StyledDropBlock = styled.div<{
   isHover: boolean;
   needBorder: boolean;
 }>`
   width: 240px;
-  /* height: 100%; */
+
   height: ${({ needBorder }) => {
     if (!needBorder) {
       return "456px";
@@ -34,9 +23,7 @@ const StyledDropBlock = styled.div<{
     }
   }};
 
-  /* margin: 20px 0px; */
   display: flex;
-  /* gap: 12px; */
   flex-direction: column;
   align-items: center;
   background-color: ${({ isHover }) => {
@@ -50,12 +37,12 @@ const StyledDropBlock = styled.div<{
     }
   }};
   border-radius: 6px;
-  /* gap: 12px; */
+  gap: 12px;
   /* box-sizing: border-box; */
-  & > * {
+  /*   & > * {
     padding: 6px 0px 6px;
     width: 100%;
-  }
+  } */
   /* & > :nth-child(4) {
     padding-bottom: 0;
   } */
@@ -90,28 +77,41 @@ export const DropItem: FC<DropItemProps> = ({
         },
         monitor
       ) => {
-        monitor.isOver({ shallow: true });
+        // monitor.isOver({ shallow: true });
+
+        const elemForUnderline = document.getElementById("styledDropBlock");
+        const dragNodeList = elemForUnderline?.querySelectorAll(".styledDrag");
+
+        const lastDrag =
+          dragNodeList && (Array.from(dragNodeList).pop() as HTMLDivElement);
+
+        if (lastDrag) {
+          lastDrag.style.backgroundImage = `url(${separator})`;
+          lastDrag.style.backgroundPosition = "bottom";
+        }
+
+        // console.log(lastDrag);
 
         if (!dropNodeRef.current) {
           return;
         }
-        /*    console.log("started underline"); */
-        hoverItemInfo.current.underlineDropElem = true;
-        const dropBlock = document.getElementById("styledDropBlock");
-        if (dropBlock) {
-          const lastDragItem = dropBlock.querySelector(
-            ".styledDrag .styledDropBlock:last-child"
-          );
-          // const lastDragItem = Array.from(
-          //   dropBlock.querySelectorAll(".styledDrag")
-          // ).at(-1);
-          /*           console.log("lastDragItem", lastDragItem); */
+        if (item.containerType === "constructorItem") {
+          hoverItemInfo.current.underlineDropElem = true;
         }
-
-        // dragList?.length
       },
+
       drop: (item, monitor) => {
         hoverItemInfo.current.underlineDropElem = false;
+        console.log("was drop");
+
+        const elemForUnderline = document.getElementById("styledDropBlock");
+        const dragNodeList = elemForUnderline?.querySelectorAll(".styledDrag");
+
+        const lastDrag =
+          dragNodeList && (Array.from(dragNodeList).pop() as HTMLDivElement);
+        if (lastDrag) {
+          lastDrag.style.backgroundImage = "none";
+        }
       },
 
       collect: (monitor) => ({
@@ -125,10 +125,6 @@ export const DropItem: FC<DropItemProps> = ({
   );
 
   drop(dropNodeRef);
-  if (!isOver) {
-    hoverItemInfo.current.underlineDropElem = false;
-    console.log("!isOver");
-  }
 
   return (
     <StyledDropBlock

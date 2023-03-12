@@ -20,11 +20,12 @@ const EqualSignContainer = styled.div<{
       return "none ";
     }
   }};
-  padding: ${({ hasBorder }) => {
+  padding: 4px;
+  /* padding: ${({ hasBorder }) => {
     if (hasBorder) {
       return "4px";
     }
-  }};
+  }}; */
   opacity: ${({ view }) => {
     if (view === "disable") {
       return "0.4 ";

@@ -5,7 +5,7 @@ import { useDrop } from "react-dnd";
 import { initialState, reducer } from "./business/reducer";
 import { AppContext } from "./App.provider";
 
-import { DragItemNew } from "./component/DragItemNew";
+import { DragItem } from "./component/DragItem";
 import { DropItem } from "./component/DropItem";
 
 import ExampleFirst from "./example/first/example";
@@ -66,7 +66,7 @@ export const App = () => {
 
   const dragList = state.sideBar.map((constructorItem) => {
     return (
-      <DragItemNew
+      <DragItem
         id={`${constructorItem.name}${ItemDragType.CONSTRUCTOR_ITEM}`}
         name={constructorItem.name}
         key={constructorItem.name}
@@ -82,7 +82,7 @@ export const App = () => {
     const calculatorList = state.canvas.length
       ? state.canvas.map((constructorItem, index) => {
           return (
-            <DragItemNew
+            <DragItem
               id={`${constructorItem.name}${ItemDragType.CALCULATOR_ITEM}`}
               name={constructorItem.name}
               key={constructorItem.name}
@@ -103,24 +103,33 @@ export const App = () => {
     collect: (monitor) => ({
       canDrop: !monitor.canDrop(),
     }),
-    hover: () => {
-      if (hoverItemInfo) {
-        // hoverItemInfo.current.underlineLevel = undefined;
-        // hoverItemInfo.current.underlineDropElem = false;
-      }
-    },
-    drop: () => {
-      if (hoverItemInfo) {
-        hoverItemInfo.current.underlineLevel = undefined;
-        hoverItemInfo.current.underlineDropElem = false;
-      }
-    },
+    // hover: () => {
+    //   if (hoverItemInfo) {
+    //     hoverItemInfo.current.underlineDropElem = false;
+    //     if (hoverItemInfo.current.elemWithUnderline) {
+    //       hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
+    //         "none";
+    //       hoverItemInfo.current.elemWithUnderline = undefined;
+    //     }
+    //   }
+    // },
+    // drop: () => {
+    //   if (hoverItemInfo) {
+    //     hoverItemInfo.current.underlineLevel = undefined;
+    //     hoverItemInfo.current.underlineDropElem = false;
+    //     if (hoverItemInfo.current.elemWithUnderline) {
+    //       hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
+    //         "none";
+    //       hoverItemInfo.current.elemWithUnderline = undefined;
+    //     }
+    //   }
+    // },
   }));
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <StyledContainer>
-        <DragContainer ref={drop}>{dragList}</DragContainer>
+        <DragContainer /* ref={drop} */>{dragList}</DragContainer>
         <DropContainer>
           {/*       drop here */}
           <DropItem

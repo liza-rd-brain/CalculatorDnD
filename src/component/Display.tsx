@@ -20,12 +20,13 @@ const DisplayContainer = styled.div<{
       return "none ";
     }
   }};
-
+  padding: 4px;
+  /* 
   padding: ${({ hasBorder }) => {
     if (hasBorder) {
       return "4px";
     }
-  }};
+  }}; */
 
   opacity: ${({ view }) => {
     if (view === "disable") {
