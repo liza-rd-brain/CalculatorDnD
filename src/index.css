@@ -14,6 +14,16 @@ code {
     monospace;
 }
 
-.withSeparatorTop {}
+.withSeparatorTop {
+  background-image: url("./underline.png") !important;
+  background-position: top;
+}
 
-.withSeparatorBotoom {}
+.withSeparatorBottom {
+  background-image: url("./underline.png") !important;
+  background-position: bottom;
+}
+
+.plainElem {
+  background-image: none;
+}

@@ -10,7 +10,12 @@ import { OperationList } from "./OperationList";
 import { NumberPanel } from "./NumberPanel";
 import { EqualSign } from "./EqualSign";
 
-import separator from "./underline.png";
+import {
+  addBottomSeparator,
+  addTopSeparator,
+  clearAllDragElem,
+  clearSeparator,
+} from "../utils/changeSeparator";
 
 const StyledDragBlock = styled.div<{
   hasHoverTop?: boolean;
@@ -22,17 +27,6 @@ const StyledDragBlock = styled.div<{
   box-sizing: border-box;
   background-repeat: no-repeat;
   background-size: contain;
-  /* border-bottom: ${({ hasHoverBottom }) => {
-    if (hasHoverBottom) {
-      return "1px solid red";
-    }
-  }}; */
-  background-image: ${({ hasHoverBottom }) => {
-    if (hasHoverBottom) {
-      return `url(${separator})`;
-    }
-  }};
-  background-position: bottom;
 `;
 
 type DragProps = {
@@ -98,31 +92,14 @@ export const DragItem: FC<DragProps> = ({
       type: type,
       item: { id, name, index: currIndex, containerType: type },
       end: (item, monitor) => {
-        const dragList = document.querySelectorAll(".styledDrag");
-        const dragArray = Array.from(dragList);
-
-        for (const dragElem of dragArray) {
-          (dragElem as HTMLDivElement).style.backgroundImage = "none";
-        }
-
-        console.log("end drag");
+        clearAllDragElem();
 
         if (hoverItemInfo && hoverItemInfo.current.elemWithUnderline) {
-          hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
-            "none";
+          // hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
+          //   "none";
           hoverItemInfo.current.elemWithUnderline = undefined;
           hoverItemInfo.current.underlineDropElem = false;
         }
-
-        // if (dragNodeRef.current) {
-        //   dragNodeRef.current.style.backgroundImage = "none";
-        // }
-
-        if (hoverItemInfo && hoverItemInfo.current.elemWithUnderline) {
-          hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
-            "none";
-        }
-        // console.log("remove all underline");
 
         const dropResult = monitor.getDropResult<any>();
         /**
@@ -161,17 +138,13 @@ export const DragItem: FC<DragProps> = ({
     [state.sideBar, state.canvas]
   );
 
-  const [{}, drop] = useDrop(
+  const [, drop] = useDrop(
     () => ({
       accept: [ItemDragType.CONSTRUCTOR_ITEM, ItemDragType.CALCULATOR_ITEM],
       drop: () => {
+        //TODO: is it need?!
         if (dragNodeRef.current) {
           dragNodeRef.current.style.backgroundImage = "none";
-        }
-
-        if (hoverItemInfo) {
-          // hoverItemInfo.current.underlineLevel = undefined;
-          // hoverItemInfo.current.underlineDropElem = false;
         }
 
         if (typeof draggingNewIndex.current === "number") {
@@ -194,22 +167,6 @@ export const DragItem: FC<DragProps> = ({
           !hoverItemInfo
         ) {
           return;
-        }
-
-        const dragList = document.querySelectorAll(".styledDrag");
-        const dragArray = Array.from(dragList);
-
-        for (const dragElem of dragArray) {
-          (dragElem as HTMLDivElement).style.backgroundImage = "none";
-        }
-
-        console.log("end drag");
-
-        if (hoverItemInfo && hoverItemInfo.current.elemWithUnderline) {
-          hoverItemInfo.current.elemWithUnderline.style.backgroundImage =
-            "none";
-          hoverItemInfo.current.elemWithUnderline = undefined;
-          hoverItemInfo.current.underlineDropElem = false;
         }
 
         //! назначаем индекс элементу, который тащим
@@ -241,12 +198,9 @@ export const DragItem: FC<DragProps> = ({
           !targetIsNotDropEl
         ) {
           return;
-        } else {
-          console.log("перерисовка");
         }
 
         const hasHoverBottom = targetIsNotDropEl && !isAboveMiddle;
-
         const hasHoverTop = targetIsNotDropEl && isAboveMiddle;
 
         // //* очищаем предыдущее подчеркивание
@@ -255,14 +209,14 @@ export const DragItem: FC<DragProps> = ({
             "none";
         }
 
+        clearAllDragElem();
+
         if (hasHoverTop) {
-          dragNodeRef.current.style.backgroundImage = `url(${separator})`;
-          dragNodeRef.current.style.backgroundPosition = "top";
+          clearSeparator(dragNodeRef.current);
+          addTopSeparator(dragNodeRef.current);
         } else if (hasHoverBottom) {
-          dragNodeRef.current.style.backgroundImage = `url(${separator})`;
-          dragNodeRef.current.style.backgroundPosition = "bottom";
-        } else {
-          dragNodeRef.current.style.backgroundImage = "none";
+          clearSeparator(dragNodeRef.current);
+          addBottomSeparator(dragNodeRef.current);
         }
 
         ///* Сохраняю элемент, который тяну!!!!/
@@ -291,23 +245,8 @@ export const DragItem: FC<DragProps> = ({
 
   drag(drop(dragNodeRef));
 
-  const hasHoverBottom =
-    !hoverItemInfo?.current.elemWithUnderline &&
-    hoverItemInfo?.current.underlineDropElem &&
-    Number(currIndex) + 1 === state.canvas.length;
-
-  // console.log(hasHoverBottom);
-
   return (
-    <StyledDragBlock
-      className="styledDrag"
-      ref={dragNodeRef}
-      // hasHoverBottom={
-      //   !hoverItemInfo?.current.elemWithUnderline &&
-      //   hoverItemInfo?.current.underlineDropElem &&
-      //   Number(currIndex) + 1 === state.canvas.length
-      // }
-    >
+    <StyledDragBlock className="styledDrag" ref={dragNodeRef}>
       {getCalculator(name, view, hasBorder)}
     </StyledDragBlock>
   );

@@ -6,6 +6,7 @@ import { ItemDragType, DragType } from "../App";
 import { useAppContext } from "../App.provider";
 
 import { CalculatorItem, CalculatorItemName } from "../business/types";
+import { clearDropUnderline } from "../utils/changeSeparator";
 
 import separator from "./underline.png";
 
@@ -77,18 +78,12 @@ export const DropItem: FC<DropItemProps> = ({
         },
         monitor
       ) => {
-        // monitor.isOver({ shallow: true });
-
-        const elemForUnderline = document.getElementById("styledDropBlock");
-        const dragNodeList = elemForUnderline?.querySelectorAll(".styledDrag");
-
-        const lastDrag =
-          dragNodeList && (Array.from(dragNodeList).pop() as HTMLDivElement);
-
-        if (lastDrag) {
-          lastDrag.style.backgroundImage = `url(${separator})`;
-          lastDrag.style.backgroundPosition = "bottom";
+        //* Если подсвечиваем уже dragElement на hover
+        if (hoverItemInfo.current.elemWithUnderline) {
+          return;
         }
+
+        clearDropUnderline();
 
         // console.log(lastDrag);
 
@@ -100,9 +95,8 @@ export const DropItem: FC<DropItemProps> = ({
         }
       },
 
-      drop: (item, monitor) => {
+      drop: () => {
         hoverItemInfo.current.underlineDropElem = false;
-        console.log("was drop");
 
         const elemForUnderline = document.getElementById("styledDropBlock");
         const dragNodeList = elemForUnderline?.querySelectorAll(".styledDrag");
@@ -110,7 +104,7 @@ export const DropItem: FC<DropItemProps> = ({
         const lastDrag =
           dragNodeList && (Array.from(dragNodeList).pop() as HTMLDivElement);
         if (lastDrag) {
-          lastDrag.style.backgroundImage = "none";
+          lastDrag.classList.remove("withSeparatorTop", "withSeparatorBottom");
         }
       },
 
